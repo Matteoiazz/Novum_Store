@@ -9,11 +9,12 @@ Tutto si fa nel file **`capi.js`** (istruzioni in cima al file):
 3. Facoltativo: `inquadratura: "alto" | "centro" | "basso"` sceglie quale parte della foto tenere nei ritagli.
 4. Per un capo venduto, cancella la sua riga.
 
-La vetrina che ruota in home, gli "Ultimi arrivi", i filtri e il catalogo si aggiornano da soli.
+Il muro di foto in home, gli "Ultimi arrivi", i filtri e il catalogo si aggiornano da soli.
 Le richieste dei clienti arrivano su WhatsApp con il nome del capo già scritto.
 
 ## Da fare con il negozio
 - Sostituire capi, prezzi e foto con quelli reali (le foto attuali vengono da Instagram, bassa risoluzione).
+- Foto del negozio: sostituire `img/negozio.jpg` (stesso nome file).
 - Logo in versione vettoriale (ora il corsivo è reso con il font Great Vibes).
 - Ferie e chiusure: `CLOSURES` in `app.js`.
 

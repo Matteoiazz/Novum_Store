@@ -122,7 +122,7 @@ Un'unica famiglia variabile, **Archivo**, usata sull'asse della larghezza: wdth 
 
 ## Layout
 
-Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra); logo a strass, titolo, vetrina che ruota e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, titolo, vetrina che ruota, poi testo e azioni. Home: una riga con i primi 4 capi di `capi.js` e un bottone verso il catalogo. Ogni sezione della home sta in una schermata sotto la barra (foto e spaziature limitate in `svh`, `--sec-pad`); orari raggruppati (Lunedì–Sabato / Domenica) e mappa accanto all'indirizzo. Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
+Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra); logo a strass, titolo, muro di capi e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, foto a tutto schermo con logo, titolo e un bottone. Home: una riga con i primi 4 capi di `capi.js` e un bottone verso il catalogo. Ogni sezione della home sta in una schermata sotto la barra (foto e spaziature limitate in `svh`, `--sec-pad`); Negozio: la foto del negozio (`img/negozio.jpg`) è l'elemento principale a sinistra; a destra stato aperto/chiuso, orari grandi (riga di oggi in bianco), mappa che riempie lo spazio e bottoni Indicazioni/Chiama. Su telefono si toglie ciò che è già nella barra in basso (bottoni del negozio, passi dei contatti, link per capo). Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
 
 ## Elevation & Depth
 
@@ -130,7 +130,7 @@ Piatto. La profondità viene dai filetti e dall'inversione paper/ink. L'unica "o
 
 ## Shapes
 
-Pillole (999px) per bottoni e chip; 12–14px per foto e blocchi; 18px per la vetrina che ruota.
+Pillole (999px) per bottoni e chip; 12–14px per foto e blocchi; 16px per foto del negozio e mappa.
 
 ## Components
 
@@ -146,8 +146,8 @@ Foto 3:4 su ink-3, raggio 12px, pillola "Nuovo" sui 3 arrivi più recenti, nome 
 ### Navigation
 Barra fissa ink al 92% con blur, logo in corsivo + ABBIGLIAMENTO, link oak che diventano paper con sottolineatura, stato del negozio dal vivo, bottone WhatsApp.
 
-### Vetrina che ruota (home)
-Scheda accanto al titolo (sotto il titolo su mobile) che mostra a rotazione **tutti** i capi di `capi.js` con dissolvenza di 700ms ogni 4.5s: foto, categoria, nome in maiuscolo wdth 122, prezzo. Barra sotto la foto con "1 / N" e frecce; swipe su touch; si ferma al passaggio del mouse, col focus, fuori schermo e con prefers-reduced-motion. Il clic apre il capo nel catalogo.
+### Muro di capi (home)
+L'hero è a tutto schermo: dietro, colonne verticali di foto dei capi (4 su desktop, 2 su tablet, 1 su telefono) con 2px di separazione. Ogni 2.6s una colonna alla volta, in sequenza, passa al capo successivo di `capi.js` con una tendina che sale (clip-path, 1.1s) e un lento zoom 1.1→1 su 9s. Sopra: sfumature nere in alto e in basso, logo a strass, titolo in maiuscolo wdth 122 e due bottoni (catalogo pieno, WhatsApp vetro scuro; su telefono solo il catalogo, WhatsApp sta nella barra in basso). Nessun controllo: le colonne sono solo cliccabili verso il capo nel catalogo. Si ferma fuori schermo e con prefers-reduced-motion.
 
 ### Ultimi arrivi (home)
 I primi 4 capi di `capi.js` (chi è in cima è il più nuovo), senza date né bollini, con categoria e "Chiedi su WhatsApp". Ogni foto usa l'`inquadratura` del capo come `object-position`.

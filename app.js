@@ -98,57 +98,60 @@
     }).join("");
   }
 
-  /* ---------------- Vetrina che ruota (home) ---------------- */
-  function initShowcase() {
-    const box = $("[data-show]"); if (!box || !ITEMS.length) { if (box) box.hidden = true; return; }
-    const DUR = 4500;
-    box.innerHTML = `
-      <div class="show__slides">
-        ${ITEMS.map((it, i) => `
-          <a class="show__slide${i === 0 ? " is-on" : ""}" href="catalogo.html#${it.id}" ${i === 0 ? "" : 'tabindex="-1" aria-hidden="true"'}>
-            <img src="${esc(it.img)}" alt="${esc(it.alt)}" style="object-position:${it.pos}" ${i > 1 ? 'loading="lazy"' : ""} width="360" height="640">
-            <span class="show__cap">
-              <span class="show__cat">${esc(catLabelOf(it.cat))}</span>
-              <span class="show__name">${esc(it.name)}</span>
-              <span class="show__price">${euro(it.price)}</span>
-            </span>
-          </a>`).join("")}
-      </div>
-      <div class="show__bar">
-        <span class="show__count" aria-live="polite" data-show-count>1 / ${ITEMS.length}</span>
-        <span class="show__ctrls">
-          <button type="button" class="show__btn" data-show-prev aria-label="Capo precedente"><svg class="ico"><use href="#i-left"/></svg></button>
-          <button type="button" class="show__btn" data-show-next aria-label="Capo successivo"><svg class="ico"><use href="#i-right"/></svg></button>
-        </span>
-      </div>`;
-    const slides = $$(".show__slide", box), count = $("[data-show-count]", box);
-    let idx = 0, timer = 0, held = false, visible = true;
-    function go(n) {
-      slides[idx].classList.remove("is-on"); slides[idx].setAttribute("aria-hidden", "true"); slides[idx].tabIndex = -1;
-      idx = (n + slides.length) % slides.length;
-      slides[idx].classList.add("is-on"); slides[idx].removeAttribute("aria-hidden"); slides[idx].removeAttribute("tabindex");
-      const img = $("img", slides[(idx + 1) % slides.length]); if (img) img.loading = "eager";
-      count.textContent = `${idx + 1} / ${slides.length}`;
+  /* ---------------- Muro di capi (home) ---------------- */
+  function initWall() {
+    const wall = $("[data-wall]"); if (!wall) return;
+    if (!ITEMS.length) { wall.hidden = true; return; }
+    const STEP = 2600;
+    let cols = 0, shown = [], next = 0, tick = 0, timer = 0, visible = true;
+
+    const colsNow = () => Math.max(1, parseInt(getComputedStyle(wall).getPropertyValue("--cols"), 10) || 1);
+    const imgTag = (it, cls) => `<img class="wall__img ${cls}" src="${esc(it.img)}" alt="" style="object-position:${it.pos}" draggable="false">`;
+
+    function build() {
+      cols = colsNow();
+      shown = Array.from({ length: cols }, (_, i) => i % ITEMS.length);
+      next = cols % ITEMS.length; tick = 0;
+      wall.innerHTML = shown.map((k) => {
+        const it = ITEMS[k];
+        return `<a class="wall__col" href="catalogo.html#${it.id}" tabindex="-1">${imgTag(it, "is-still")}</a>`;
+      }).join("");
       plan();
     }
-    function plan() {
-      clearTimeout(timer);
-      if (REDUCED || held || !visible || document.hidden || slides.length < 2) return;
-      timer = setTimeout(() => go(idx + 1), DUR);
+
+    function swap() {
+      if (ITEMS.length <= cols) return;
+      const c = tick % cols; tick++;
+      let k = next, guard = 0;
+      while (shown.includes(k) && guard++ < ITEMS.length) k = (k + 1) % ITEMS.length;
+      next = (k + 1) % ITEMS.length;
+      const it = ITEMS[k], col = wall.children[c];
+      const pre = new Image();
+      pre.onload = pre.onerror = () => {
+        if (!col.isConnected) return;
+        shown[c] = k;
+        col.href = `catalogo.html#${it.id}`;
+        col.insertAdjacentHTML("beforeend", imgTag(it, "is-in"));
+        const fresh = col.lastElementChild;
+        fresh.addEventListener("animationend", (e) => {
+          if (e.animationName !== "wall-wipe") return;
+          [...col.querySelectorAll(".wall__img")].forEach((im) => { if (im !== fresh) im.remove(); });
+        });
+      };
+      pre.src = it.img;
     }
-    $("[data-show-prev]", box).addEventListener("click", () => go(idx - 1));
-    $("[data-show-next]", box).addEventListener("click", () => go(idx + 1));
-    if (slides.length < 2) $(".show__ctrls", box).hidden = true;
-    box.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") { held = true; plan(); } });
-    box.addEventListener("pointerleave", () => { held = false; plan(); });
-    box.addEventListener("focusin", () => { held = true; plan(); });
-    box.addEventListener("focusout", () => { held = false; plan(); });
-    let sx = 0;
-    box.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; }, { passive: true });
-    box.addEventListener("touchend", (e) => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1)); }, { passive: true });
-    new IntersectionObserver(([en]) => { visible = en.isIntersecting; plan(); }, { threshold: 0.3 }).observe(box);
+
+    function plan() {
+      clearInterval(timer);
+      if (REDUCED || !visible || document.hidden || ITEMS.length <= cols) return;
+      timer = setInterval(swap, STEP);
+    }
+
+    let rt = 0;
+    addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (colsNow() !== cols) build(); }, 150); });
+    new IntersectionObserver(([en]) => { visible = en.isIntersecting; plan(); }).observe(wall);
     document.addEventListener("visibilitychange", plan);
-    plan();
+    build();
   }
 
   /* ---------------- Ultimi arrivi (home) ---------------- */
@@ -167,8 +170,6 @@
           <a class="item__ask" href="${askLink(it)}" target="_blank" rel="noopener">Chiedi su WhatsApp <svg class="ico"><use href="#i-arrow"/></svg></a>
         </div>
       </li>`).join("");
-    const more = $("[data-more-label]");
-    if (more) more.textContent = `Vedi tutti i ${ITEMS.length} capi`;
   }
 
   /* ---------------- Catalogo ---------------- */
@@ -462,7 +463,7 @@
   /* ---------------- Boot ---------------- */
   renderStatus();
   setInterval(renderStatus, 30_000);
-  initShowcase();
+  initWall();
   initLatestGrid();
   initCatalogPage();
   initStrass();
