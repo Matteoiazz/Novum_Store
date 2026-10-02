@@ -90,37 +90,34 @@
     </section>
 
     <section class="store" id="negozio" aria-labelledby="negozio-title">
-      <figure class="store__photo store__photo--main">
+      <figure class="store__photo">
         <img src="img/ig/ig03.jpg" alt="Interno del negozio Novum Store: pareti bianche, appendiabiti neri con camicie, scaffali con cappelli e jeans." loading="lazy" width="480" height="640">
       </figure>
       <div class="store__body">
         <h2 id="negozio-title" class="h2">Il negozio</h2>
         <p class="store__lede">Una vetrina nera su Piazza Gullo, il logo sullo zerbino, dentro capi appesi uno per uno. Vieni a provarli.</p>
 
-        <div class="status-panel" data-status-panel>
-          <p class="status-panel__state" data-status-big>—</p>
-          <p class="status-panel__next" data-status-next></p>
+        <div class="store__info">
+          <div class="status-panel" data-status-panel>
+            <p class="status-panel__state" data-status-big>—</p>
+            <p class="status-panel__next" data-status-next></p>
+          </div>
+          <table class="hours">
+            <caption class="sr">Orari di apertura</caption>
+            <tbody data-hours></tbody>
+          </table>
         </div>
 
-        <table class="hours">
-          <caption class="sr">Orari di apertura</caption>
-          <tbody data-hours></tbody>
-        </table>
-
-        <a class="addr" href="https://www.google.com/maps/search/?api=1&query=Piazza+Fausto+e+Luigi+Gullo+22+Cosenza" target="_blank" rel="noopener">
-          <svg class="ico"><use href="#i-pin"/></svg>
-          <span><strong>Piazza Fausto e Luigi Gullo 22</strong><br>87100 Cosenza · Apri in Maps</span>
-          <svg class="ico addr__go"><use href="#i-arrow"/></svg>
-        </a>
-      </div>
-      <figure class="store__photo store__photo--b">
-        <img src="img/ig/ig11.jpg" alt="Ingresso del negozio visto dall'alto, con la porta a vetri e lo zerbino col logo." loading="lazy" width="361" height="640">
-      </figure>
-      <figure class="store__photo store__photo--c">
-        <img src="img/ig/ig12.jpg" alt="Un ragazzo con cappello e occhiali da sole davanti alla vetrina del negozio." loading="lazy" width="361" height="640">
-      </figure>
-      <div class="store__map">
-        <iframe title="Mappa: Novum Store, Piazza Fausto e Luigi Gullo 22, Cosenza" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=Piazza%20Fausto%20e%20Luigi%20Gullo%2022%2C%20Cosenza&z=16&output=embed"></iframe>
+        <div class="store__where">
+          <a class="addr" href="https://www.google.com/maps/search/?api=1&query=Piazza+Fausto+e+Luigi+Gullo+22+Cosenza" target="_blank" rel="noopener">
+            <svg class="ico"><use href="#i-pin"/></svg>
+            <span><strong>Piazza Fausto e Luigi Gullo 22</strong><br>87100 Cosenza · Apri in Maps</span>
+            <svg class="ico addr__go"><use href="#i-arrow"/></svg>
+          </a>
+          <div class="store__map">
+            <iframe title="Mappa: Novum Store, Piazza Fausto e Luigi Gullo 22, Cosenza" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=Piazza%20Fausto%20e%20Luigi%20Gullo%2022%2C%20Cosenza&z=16&output=embed"></iframe>
+          </div>
+        </div>
       </div>
     </section>
 

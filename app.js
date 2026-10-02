@@ -16,7 +16,7 @@
     Object.keys(CAT_LABELS).filter((k) => ITEMS.some((i) => i.cat === k)).map((k) => ({ id: k, label: CAT_LABELS[k] }))
   );
   const catLabelOf = (id) => CAT_LABELS[id] || id;
-  const HOME_COUNT = 8;
+  const HOME_COUNT = 4;
 
   // Orari (ora di Roma). Giorni: 0 = domenica.
   const HOURS = { 1: [[600, 780], [960, 1200]], 2: [[600, 780], [960, 1200]], 3: [[600, 780], [960, 1200]], 4: [[600, 780], [960, 1200]], 5: [[600, 780], [960, 1200]], 6: [[600, 780], [960, 1200]], 0: [] };
@@ -79,12 +79,17 @@
   function renderHours() {
     const tb = $("[data-hours]"); if (!tb) return;
     const { dow } = romeNow();
-    const order = [1, 2, 3, 4, 5, 6, 0];
-    tb.innerHTML = order.map((d) => {
-      const s = HOURS[d];
-      const txt = s.length ? s.map(([a, b]) => `${hhmm(a)}–${hhmm(b)}`).join(" · ") : "Chiuso";
-      const name = DAY_NAMES[d][0].toUpperCase() + DAY_NAMES[d].slice(1);
-      return `<tr class="${d === dow ? "is-today" : ""}"><th scope="row">${name}</th><td>${txt}</td></tr>`;
+    const fmt = (d) => (HOURS[d].length ? HOURS[d].map(([a, b]) => `${hhmm(a)}–${hhmm(b)}`).join(" · ") : "Chiuso");
+    const cap = (s) => s[0].toUpperCase() + s.slice(1);
+    // raggruppa i giorni consecutivi con lo stesso orario (lun→dom)
+    const groups = [];
+    [1, 2, 3, 4, 5, 6, 0].forEach((d) => {
+      const last = groups[groups.length - 1];
+      if (last && last.txt === fmt(d)) last.days.push(d); else groups.push({ days: [d], txt: fmt(d) });
+    });
+    tb.innerHTML = groups.map((g) => {
+      const name = g.days.length > 1 ? `${cap(DAY_NAMES[g.days[0]])}–${DAY_NAMES[g.days[g.days.length - 1]]}` : cap(DAY_NAMES[g.days[0]]);
+      return `<tr class="${g.days.includes(dow) ? "is-today" : ""}"><th scope="row">${name}</th><td>${g.txt}</td></tr>`;
     }).join("");
   }
 
@@ -155,17 +160,12 @@
       if (sort === "price-desc") visible.sort((a, b) => b.price - a.price);
       list.innerHTML = visible.map((it, i) => `
         <li class="card" id="capo-${it.id}">
-          <button type="button" class="card__media" data-open="${it.id}" aria-label="Vedi grande: ${it.name}">
-            <img src="${it.img}" alt="${it.alt}" ${i > 2 ? 'loading="lazy"' : ""} width="360" height="640">
-            ${newest.includes(it.id) ? '<span class="item__flag">Nuovo</span>' : ""}
-            <span class="card__zoom" aria-hidden="true"><svg class="ico"><use href="#i-zoom"/></svg></span>
+          <button type="button" class="card__btn" data-open="${it.id}">
+            <span class="card__media"><img src="${it.img}" alt="${it.alt}" ${i > 7 ? 'loading="lazy"' : ""} width="360" height="640"></span>
+            <span class="card__name">${it.name}</span>
+            <span class="card__price">${euro(it.price)}</span>
+            ${newest.includes(it.id) ? '<span class="card__new">Nuovo</span>' : ""}
           </button>
-          <div class="card__body">
-            <h2 class="card__name">${it.name}</h2>
-            <p class="card__price">${euro(it.price)} <span class="price__demo">demo</span></p>
-            <p class="card__meta">${catLabel(it.cat)} · arrivato ${since(it.date)}</p>
-            <a class="btn btn--solid card__ask" href="${waLink(`Ciao Novum! Vorrei info su: ${it.name}. Taglia: `)}" target="_blank" rel="noopener"><svg class="ico"><use href="#i-chat"/></svg><span>Chiedi su WhatsApp</span></a>
-          </div>
         </li>`).join("");
       count.textContent = `${visible.length} ${visible.length === 1 ? "capo" : "capi"}${cat === "all" ? "" : ` · ${catLabel(cat)}`}`;
       list.classList.remove("is-cutting"); void list.offsetWidth; list.classList.add("is-cutting");

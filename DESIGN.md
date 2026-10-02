@@ -122,7 +122,7 @@ Un'unica famiglia variabile, **Archivo**, usata sull'asse della larghezza: wdth 
 
 ## Layout
 
-Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra − striscia demo); logo a strass, titolo, scheda Ultimo arrivo e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, titolo, Ultimo arrivo, poi testo e azioni. Home: gli 8 capi più recenti in 4 colonne (2 sotto i 1080px) e un bottone verso il catalogo. Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
+Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra − striscia demo); logo a strass, titolo, scheda Ultimo arrivo e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, titolo, Ultimo arrivo, poi testo e azioni. Home: una riga con i 4 capi più recenti e un bottone verso il catalogo. Ogni sezione della home sta in una schermata sotto la barra (foto e spaziature limitate in `svh`, `--sec-pad`); orari raggruppati (Lunedì–Sabato / Domenica) e mappa accanto all'indirizzo. Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
 
 ## Elevation & Depth
 
@@ -149,8 +149,8 @@ Barra fissa ink al 92% con blur, logo in corsivo + ABBIGLIAMENTO, link oak che d
 ### Ultimo arrivo (home)
 Scheda 9:16 accanto al titolo: foto del capo più recente in `capi.js`, sfumatura in basso, "ULTIMO ARRIVO · quando", nome in maiuscolo wdth 125, prezzo e "Chiedi". Si aggiorna da sola; nessun contenuto da gestire a parte.
 
-### Pagina Catalogo
-`catalogo.html`: titolo CATALOGO a wdth 125, barra filtri e ordinamento fissa sotto la navigazione, griglia di schede grandi (3 colonne, 2 sotto i 1080px, 1 sotto i 640px) con foto 4:5, nome e prezzo grandi, bottone "Chiedi su WhatsApp". Il clic sulla foto apre un visore (`<dialog>`) con foto intera, frecce, swipe, ←/→ e link condivisibile `catalogo.html#id-capo`; dalla home ogni foto porta al capo nel visore.
+### Pagina Catalogo (eccezione voluta: zero estetica)
+`catalogo.html` non segue il mondo nero della home: su richiesta del cliente è neutra come un e-commerce tipo Zara, così contano solo i capi. Fondo bianco, testo nero, griglia di foto **quadrate** quasi a filo (4 colonne, 3 sotto i 1080px, 2 sotto i 760px), sotto solo nome in maiuscolo e prezzo a 12px. Filtri come testo sottolineato, ordinamento come testo, bottoni rettangolari neri. Il clic su un capo apre il visore (`<dialog>`) bianco con foto intera, frecce, swipe, ←/→, "Chiedi su WhatsApp" e link condivisibile `catalogo.html#id-capo`. Implementato come override dei token sotto `.page-catalog`.
 
 ### Strass wordmark (signature)
 "NOVUM" campionato da Archivo 900 ultra-espanso su griglia sfalsata e disegnato come strass. I punti si sparpagliano sotto il cursore o il dito e tornano a posto con una molla, con qualche bagliore a croce. Con prefers-reduced-motion è statico.
