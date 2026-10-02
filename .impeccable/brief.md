@@ -15,3 +15,7 @@ FIRST VIEWPORT: Desktop: left 60% a huge "NEW DROP" headline with drop counter a
 FORM: Drop Reel, position 4 of my ordered list, seed key 20459c95. Raises: live status instrument (six-pack), strass wordmark scattering under cursor (alphabet storm), hard cuts no easing (acetate), black total commitment (lobes), spray-tag mark on the CTA (zine), "out N days ago" stamp per drop (brine).
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+
+## Revision 2026-10-02
+Reel removed at the user's request (the owner can't produce reels). Hero right side is now a static 'Ultimo arrivo' card generated from the newest entry in capi.js. Home grid shows the 8 newest; full browsing lives on catalogo.html.

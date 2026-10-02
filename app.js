@@ -6,29 +6,17 @@
   const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches || /[?&]still\b/.test(location.search);
   const FINE_POINTER = matchMedia("(pointer: fine)").matches;
 
-  // Prezzi e nomi DIMOSTRATIVI: da sostituire con i dati reali del negozio.
-  const ITEMS = [
-    { id: "flanella-fiamme", name: "Camicia flanella con fiamme di strass", cat: "camicie", price: 79, img: "img/ig/ig01.jpg", date: "2026-09-30", alt: "Camicia di flanella a quadri bianchi e neri con fiamme disegnate in strass." },
-    { id: "felpa-again", name: "Felpa “Again” aquila e strass", cat: "felpe", price: 69, img: "img/ig/ig02.jpg", date: "2026-09-25", alt: "Felpa bianca con scritta Again gialla, aquila e fiamme, strass sulla spalla." },
-    { id: "set-denim-nero", name: "Giacca e jeans denim nero cuciture a contrasto", cat: "denim", price: 129, img: "img/ig/ig03.jpg", date: "2026-09-17", alt: "Ragazzo allo specchio del negozio con giacca e jeans in denim nero." },
-    { id: "longsleeve-camo", name: "Longsleeve “It’s never luck” camo", cat: "tshirt", price: 49, img: "img/ig/ig04.jpg", date: "2026-09-10", alt: "Maglia nera a maniche lunghe con scritta camouflage sulla schiena." },
-    { id: "polo-tecnica", name: "Polo tecnica nera con profili bianchi", cat: "tshirt", price: 45, img: "img/ig/ig05.jpg", date: "2026-08-28", alt: "Ragazzo all'ingresso del negozio con polo nera e pantaloni neri." },
-    { id: "tee-ritratto", name: "T-shirt oversize ritratto", cat: "tshirt", price: 39, img: "img/ig/ig06.jpg", date: "2026-08-27", alt: "T-shirt bianca oversize con ritratto stampato, davanti al negozio." },
-    { id: "set-bicolore", name: "Set camicia e bermuda bicolore", cat: "set", price: 89, img: "img/ig/ig08.jpg", date: "2026-07-31", alt: "Completo camicia e bermuda bianco con inserti blu notte." },
-    { id: "bermuda-raggi", name: "Bermuda denim nero raggi di strass", cat: "denim", price: 59, img: "img/ig/ig09.jpg", date: "2026-07-16", alt: "Bermuda in denim nero con raggi e punti di strass." },
-    { id: "set-fiamme", name: "Set camicia e short fiamme elettriche", cat: "set", price: 85, img: "img/ig/ig10.jpg", date: "2026-07-10", alt: "Completo camicia e short con stampa a fiamme arancio e blu." },
-    { id: "set-camo", name: "Set camicia e bermuda camo", cat: "set", price: 95, img: "img/ig/ig11.jpg", date: "2026-07-09", alt: "Completo camicia nera e bermuda camouflage, visto dall'alto." }
-  ];
-  const CATS = [
-    { id: "all", label: "Tutto" },
-    { id: "camicie", label: "Camicie" },
-    { id: "tshirt", label: "T-shirt e polo" },
-    { id: "felpe", label: "Felpe" },
-    { id: "denim", label: "Denim" },
-    { id: "set", label: "Set" }
-  ];
-  const FEATURED = ["flanella-fiamme", "set-fiamme"];
-  const REEL_IDS = ["flanella-fiamme", "felpa-again", "set-denim-nero", "longsleeve-camo", "polo-tecnica", "tee-ritratto"];
+  // I capi si modificano in capi.js
+  const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const CAT_LABELS = window.NOVUM_CATEGORIE || {};
+  const ITEMS = (window.NOVUM_CAPI || [])
+    .map((c) => ({ id: slug(c.nome), name: c.nome, cat: c.categoria, price: Number(c.prezzo), img: c.foto, date: c.data, alt: c.nome }))
+    .sort((x, y) => y.date.localeCompare(x.date));
+  const CATS = [{ id: "all", label: "Tutto" }].concat(
+    Object.keys(CAT_LABELS).filter((k) => ITEMS.some((i) => i.cat === k)).map((k) => ({ id: k, label: CAT_LABELS[k] }))
+  );
+  const catLabelOf = (id) => CAT_LABELS[id] || id;
+  const HOME_COUNT = 8;
 
   // Orari (ora di Roma). Giorni: 0 = domenica.
   const HOURS = { 1: [[600, 780], [960, 1200]], 2: [[600, 780], [960, 1200]], 3: [[600, 780], [960, 1200]], 4: [[600, 780], [960, 1200]], 5: [[600, 780], [960, 1200]], 6: [[600, 780], [960, 1200]], 0: [] };
@@ -111,134 +99,43 @@
   }
   const dateLabel = (iso) => new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "short" }).format(new Date(`${iso}T12:00:00Z`));
 
-  /* ---------------- Reel ---------------- */
-  function initReel() {
-    const reel = $("[data-reel]"); if (!reel) return;
-    const framesEl = $("[data-reel-frames]", reel);
-    const barsEl = $("[data-reel-bars]", reel);
-    const countEl = $("[data-reel-count]", reel);
-    const pauseBtn = $("[data-reel-pause]", reel);
-    const items = REEL_IDS.map((id) => ITEMS.find((i) => i.id === id));
-    const DUR = 5200;
-    let idx = 0, timer = 0, startedAt = 0, remaining = DUR;
-    let paused = REDUCED, hoverPause = false, userPaused = REDUCED;
-
-    framesEl.innerHTML = items.map((it, i) => `
-      <article class="frame${i === 0 ? " is-active" : ""}" role="group" aria-roledescription="slide" aria-label="${i + 1} di ${items.length}: ${it.name}">
-        <img src="${it.img}" alt="${it.alt}" width="360" height="640" ${i > 1 ? 'loading="lazy"' : ""} draggable="false">
-        <div class="frame__meta">
-          <p class="frame__when"><time datetime="${it.date}">${dateLabel(it.date)}</time> · ${since(it.date)}</p>
-          <h3 class="frame__name">${it.name}</h3>
-          <div class="frame__row">
-            <p class="price" style="margin:0">${euro(it.price)} <span class="price__demo">demo</span></p>
-            <a class="frame__ask" href="${waLink(`Ciao Novum! Vorrei info su: ${it.name}. Taglia: `)}" target="_blank" rel="noopener">Chiedi <svg class="ico"><use href="#i-arrow"/></svg></a>
-          </div>
+  /* ---------------- Ultimo arrivo (home) ---------------- */
+  function initLatest() {
+    const box = $("[data-latest]"); if (!box || !ITEMS.length) return;
+    const it = ITEMS[0];
+    box.innerHTML = `
+      <a class="latest__media" href="catalogo.html#${it.id}" aria-label="Vedi ${it.name} nel catalogo">
+        <img src="${it.img}" alt="${it.alt}" width="360" height="640">
+      </a>
+      <div class="latest__body">
+        <p class="latest__when">Ultimo arrivo · <time datetime="${it.date}">${since(it.date)}</time></p>
+        <h2 class="latest__name">${it.name}</h2>
+        <div class="latest__row">
+          <p class="price">${euro(it.price)} <span class="price__demo">demo</span></p>
+          <a class="frame__ask" href="${waLink(`Ciao Novum! Vorrei info su: ${it.name}. Taglia: `)}" target="_blank" rel="noopener">Chiedi <svg class="ico"><use href="#i-arrow"/></svg></a>
         </div>
-      </article>`).join("");
-    barsEl.innerHTML = items.map(() => `<span class="reel__bar"><i></i></span>`).join("");
-    reel.style.setProperty("--dur", `${DUR}ms`);
-    const frames = $$(".frame", framesEl);
-    const bars = $$(".reel__bar", barsEl);
-
-    function show(n, user = false) {
-      const next = (n + items.length) % items.length;
-      if (next !== idx || user) {
-        reel.classList.remove("is-cutting"); void reel.offsetWidth; reel.classList.add("is-cutting");
-      }
-      idx = next;
-      frames.forEach((f, i) => f.classList.toggle("is-active", i === idx));
-      bars.forEach((b, i) => {
-        b.classList.toggle("is-done", i < idx);
-        b.classList.remove("is-active");
-        if (i === idx) { void b.offsetWidth; b.classList.add("is-active"); }
-      });
-      countEl.textContent = `${pad(idx + 1)}/${pad(items.length)}`;
-      framesEl.setAttribute("aria-live", user ? "polite" : "off");
-      remaining = DUR; schedule();
-    }
-    function schedule() {
-      clearTimeout(timer);
-      if (paused || hoverPause) return;
-      startedAt = performance.now();
-      timer = setTimeout(() => show(idx + 1), remaining);
-    }
-    function hold() {
-      clearTimeout(timer);
-      if (startedAt) remaining = Math.max(200, remaining - (performance.now() - startedAt));
-      startedAt = 0;
-    }
-    function setPaused(p) {
-      paused = p;
-      reel.classList.toggle("is-paused", paused || hoverPause);
-      pauseBtn.setAttribute("aria-label", paused ? "Riprendi" : "Metti in pausa");
-      $("use", pauseBtn).setAttribute("href", paused ? "#i-play" : "#i-pause");
-      if (paused) hold(); else schedule();
-    }
-
-    $("[data-reel-prev]", reel).addEventListener("click", () => show(idx - 1, true));
-    $("[data-reel-next]", reel).addEventListener("click", () => show(idx + 1, true));
-    pauseBtn.addEventListener("click", () => { userPaused = !paused; setPaused(!paused); });
-
-    if (FINE_POINTER) {
-      reel.addEventListener("pointerenter", () => { hoverPause = true; reel.classList.add("is-paused"); hold(); });
-      reel.addEventListener("pointerleave", () => { hoverPause = false; reel.classList.toggle("is-paused", paused); schedule(); });
-    }
-    // swipe
-    let sx = 0, sy = 0;
-    reel.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
-    reel.addEventListener("touchend", (e) => {
-      const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.4) show(idx + (dx < 0 ? 1 : -1), true);
-    }, { passive: true });
-
-    // pause when offscreen or tab hidden
-    new IntersectionObserver(([en]) => {
-      if (userPaused) return;
-      setPaused(!en.isIntersecting);
-    }, { threshold: 0.35 }).observe(reel);
-    document.addEventListener("visibilitychange", () => { if (!userPaused) setPaused(document.hidden); });
-
-    show(0);
-    setPaused(paused);
-    reelApi = { next: () => show(idx + 1, true), prev: () => show(idx - 1, true), toggle: () => pauseBtn.click() };
+      </div>`;
   }
-  let reelApi = null;
 
   /* ---------------- Catalog ---------------- */
   let setFilter = () => {};
   function initCatalog() {
-    const grid = $("[data-grid]"), filters = $("[data-filters]"), count = $("[data-count]");
-    if (!grid) return;
-    const newest = [...ITEMS].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3).map((i) => i.id);
-    grid.innerHTML = ITEMS.map((it) => `
-      <li class="item${FEATURED.includes(it.id) ? " item--feature" : ""}" data-cat="${it.cat}">
+    const grid = $("[data-grid]"); if (!grid) return;
+    grid.innerHTML = ITEMS.slice(0, HOME_COUNT).map((it, i) => `
+      <li class="item">
         <a class="item__media" href="catalogo.html#${it.id}" aria-label="Vedi ${it.name} nel catalogo">
           <img src="${it.img}" alt="${it.alt}" loading="lazy" width="360" height="640">
-          ${newest.includes(it.id) ? '<span class="item__flag">Nuovo</span>' : ""}
+          ${i < 3 ? '<span class="item__flag">Nuovo</span>' : ""}
         </a>
         <div class="item__body">
           <h3 class="item__name">${it.name}</h3>
           <p class="price">${euro(it.price)} <span class="price__demo">demo</span></p>
-          <p class="item__cat">${CATS.find((c) => c.id === it.cat).label} · arrivato ${since(it.date)}</p>
+          <p class="item__cat">${catLabelOf(it.cat)} · arrivato ${since(it.date)}</p>
           <a class="item__ask" href="${waLink(`Ciao Novum! Vorrei info su: ${it.name}. Taglia: `)}" target="_blank" rel="noopener">Chiedi su WhatsApp <svg class="ico"><use href="#i-arrow"/></svg></a>
         </div>
       </li>`).join("");
-
-    filters.innerHTML = CATS.map((c, i) => {
-      const n = c.id === "all" ? ITEMS.length : ITEMS.filter((it) => it.cat === c.id).length;
-      return `<button type="button" class="chip" data-cat="${c.id}" aria-pressed="${i === 0}" title="Tasto ${i + 1}">${c.label} <span class="chip__n">${n}</span></button>`;
-    }).join("");
-
-    setFilter = (cat) => {
-      $$(".chip", filters).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.cat === cat)));
-      let n = 0;
-      $$(".item", grid).forEach((li) => { const on = cat === "all" || li.dataset.cat === cat; li.hidden = !on; n += on; });
-      count.textContent = `${n} ${n === 1 ? "capo" : "capi"}`;
-      grid.classList.toggle("is-filtered", cat !== "all");
-      grid.classList.remove("is-cutting"); void grid.offsetWidth; grid.classList.add("is-cutting");
-    };
-    filters.addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (b) setFilter(b.dataset.cat); });
-    setFilter("all");
+    const more = $("[data-more-label]");
+    if (more) more.textContent = `Vedi tutti i ${ITEMS.length} capi`;
   }
 
   /* ---------------- Catalog page ---------------- */
@@ -247,8 +144,8 @@
     const list = $("[data-catalog]"); if (!list) return;
     const filters = $("[data-filters]"), count = $("[data-count]"), sortEl = $("[data-sort]");
     const dlg = $("[data-viewer]");
-    const newest = [...ITEMS].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3).map((i) => i.id);
-    const catLabel = (id) => CATS.find((c) => c.id === id).label;
+    const newest = ITEMS.slice(0, 3).map((i) => i.id);
+    const catLabel = catLabelOf;
     let cat = "all", sort = "new", visible = [];
 
     function render() {
@@ -511,10 +408,7 @@
         else if (e.key === "ArrowLeft") viewerApi.step(-1);
         return;
       }
-      if (e.key === "ArrowRight" && reelApi) { reelApi.next(); }
-      else if (e.key === "ArrowLeft" && reelApi) { reelApi.prev(); }
-      else if (e.key === " " && reelApi && (e.target === document.body || e.target.closest?.("[data-reel]"))) { e.preventDefault(); reelApi.toggle(); }
-      else if (/^[1-6]$/.test(e.key)) { const c = CATS[Number(e.key) - 1]; if (c) setFilter(c.id); }
+      if (/^[1-6]$/.test(e.key)) { const c = CATS[Number(e.key) - 1]; if (c) setFilter(c.id); }
     });
   }
 
@@ -537,7 +431,7 @@
         $$(".bar__nav a").forEach((a) => a.setAttribute("aria-current", String(a.getAttribute("href") === `#${en.target.id}`)));
       });
     }, { rootMargin: "-45% 0px -50% 0px" });
-    ["drop", "capi", "negozio", "contatti"].forEach((id) => { const el = document.getElementById(id); if (el) navObserver.observe(el); });
+    ["home", "capi", "negozio", "contatti"].forEach((id) => { const el = document.getElementById(id); if (el) navObserver.observe(el); });
   }
 
   function hello() {
@@ -554,7 +448,7 @@
   /* ---------------- Boot ---------------- */
   renderStatus();
   setInterval(renderStatus, 30_000);
-  initReel();
+  initLatest();
   initCatalog();
   initCatalogPage();
   initStrass();

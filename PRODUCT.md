@@ -34,6 +34,8 @@ A physical streetwear shop with its own curated drops (rhinestone flame flannels
 
 ## Capabilities and Constraints
 
+- Owner workflow (confirmed 2026-10-02): the owner only adds garments with photos, and handles everything else on WhatsApp. Garments live in `capi.js` (one line each). No reels, videos or other content to produce.
+
 - Showcase only: no cart, no checkout, no accounts.
 - Prices shown are DEMO placeholders, clearly labelled as such, to be replaced with real prices.
 - Product names/categories are authored for the demo and must be confirmed by the owner.

@@ -1,6 +1,6 @@
 ---
 name: Novum Store
-description: Drop Reel — la vetrina che racconta ogni drop come i reel del negozio.
+description: Vetrina semplice in bianco e nero per un negozio di streetwear; i capi si gestiscono da un solo file e le richieste arrivano su WhatsApp.
 colors:
   ink: "#0a0a0a"
   ink-2: "#121212"
@@ -23,7 +23,7 @@ typography:
     fontWeight: 850
     lineHeight: 1.02
     letterSpacing: "-0.025em"
-  reel-overlay:
+  photo-overlay:
     fontFamily: "Archivo, system-ui, sans-serif"
     fontSize: "clamp(1.4rem, 2.2vw, 1.85rem)"
     fontWeight: 900
@@ -51,7 +51,7 @@ rounded:
   sm: "4px"
   md: "12px"
   lg: "14px"
-  reel: "18px"
+  card: "18px"
   pill: "999px"
 spacing:
   gutter: "clamp(16px, 4vw, 56px)"
@@ -89,7 +89,7 @@ components:
 
 ## Overview
 
-**Drop Reel.** Il sito parla la lingua che il negozio usa già su Instagram: drop numerati, fotogrammi verticali 9:16, maiuscole bianche larghissime sopra la foto, barre di avanzamento. Il nero copre tutta la superficie e il bianco è l'unico inchiostro; il beige del parquet del negozio (oak) e il grigio cemento sono gli unici toni secondari. Le transizioni sono tagli di montaggio: due fotogrammi, niente dissolvenze.
+**Vetrina in nero.** Foto verticali dei capi, maiuscole bianche larghissime sopra la foto, prezzo sempre visibile. Il proprietario carica solo capi con foto (`capi.js`) e gestisce tutto su WhatsApp; niente reel o contenuti da produrre a parte (decisione del 2026-10-02). Il nero copre tutta la superficie e il bianco è l'unico inchiostro; il beige del parquet del negozio (oak) e il grigio cemento sono gli unici toni secondari.
 
 Ogni schermata deve dire cosa c'è, quanto costa, dove si trova il negozio e come scrivere su WhatsApp. Le chicche (logo a strass che reagisce al cursore, stato aperto/chiuso dal vivo, scorciatoie da tastiera, Konami code, messaggio in console) sono premi, mai ostacoli.
 
@@ -110,27 +110,27 @@ Ogni schermata deve dire cosa c'è, quanto costa, dove si trova il negozio e com
 
 ## Typography
 
-Un'unica famiglia variabile, **Archivo**, usata sull'asse della larghezza: wdth 118–125 per la voce dei reel (titoli in maiuscolo, contatori, nomi dei capi sopra la foto), wdth 100–112 per testo e controlli. **Great Vibes** solo come firma del marchio (header e chiusura), mai per i contenuti.
+Un'unica famiglia variabile, **Archivo**, usata sull'asse della larghezza: wdth 118–125 per titoli in maiuscolo e nomi dei capi sopra la foto, wdth 100–112 per testo e controlli. **Great Vibes** solo come firma del marchio (header e chiusura), mai per i contenuti.
 
 ### Hierarchy
 - Display (H2 di sezione): 900, wdth 122, maiuscolo, -0.03em.
 - Headline (H1 hero): 850, wdth 118; scala sia con la larghezza sia con l'altezza, così la prima schermata sta tutta nel viewport.
-- Reel overlay: 900, wdth 125, maiuscolo, ombra morbida solo sopra la foto.
+- Nome sopra foto: 900, wdth 125, maiuscolo, ombra morbida solo sopra la foto.
 - Body: 400, 17px, 1.55, misura massima ~46–52ch.
 - Label: 600, 12px, maiuscolo spaziato, solo metadati brevi.
 - Numeri sempre `tabular-nums`.
 
 ## Layout
 
-Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra − striscia demo); logo a strass, titolo, reel e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, titolo, reel, poi testo e azioni. Catalogo a 4 colonne (2 sotto i 1080px) con due capi in evidenza 2×2 a incastro. Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
+Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra − striscia demo); logo a strass, titolo, scheda Ultimo arrivo e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, titolo, Ultimo arrivo, poi testo e azioni. Home: gli 8 capi più recenti in 4 colonne (2 sotto i 1080px) e un bottone verso il catalogo. Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
 
 ## Elevation & Depth
 
-Piatto. La profondità viene dai filetti e dall'inversione paper/ink. L'unica "ombra" è la sfumatura che rende leggibile il testo sopra le foto del reel.
+Piatto. La profondità viene dai filetti e dall'inversione paper/ink. L'unica "ombra" è la sfumatura che rende leggibile il testo sopra le foto.
 
 ## Shapes
 
-Pillole (999px) per bottoni e chip; 12–14px per foto e blocchi; 18px per la cornice del reel; 4px per l'etichetta DEMO.
+Pillole (999px) per bottoni e chip; 12–14px per foto e blocchi; 18px per la scheda Ultimo arrivo e il visore; 4px per l'etichetta DEMO.
 
 ## Components
 
@@ -146,8 +146,8 @@ Foto 3:4 su ink-3, raggio 12px, pillola "Nuovo" sui 3 arrivi più recenti, nome 
 ### Navigation
 Barra fissa ink al 92% con blur, logo in corsivo + ABBIGLIAMENTO, link oak che diventano paper con sottolineatura, stato del negozio dal vivo, bottone WhatsApp.
 
-### Drop Reel (signature)
-Cornice 9:16, barre di avanzamento segmentate (5.2s lineari), "NEW DROP 01/06", zone tap, swipe, pausa (hover, fuori schermo, tab nascosto), ←/→ e Spazio. Ogni cambio è un taglio secco con un lampo paper al 22% per due fotogrammi (90ms steps).
+### Ultimo arrivo (home)
+Scheda 9:16 accanto al titolo: foto del capo più recente in `capi.js`, sfumatura in basso, "ULTIMO ARRIVO · quando", nome in maiuscolo wdth 125, prezzo e "Chiedi". Si aggiorna da sola; nessun contenuto da gestire a parte.
 
 ### Pagina Catalogo
 `catalogo.html`: titolo CATALOGO a wdth 125, barra filtri e ordinamento fissa sotto la navigazione, griglia di schede grandi (3 colonne, 2 sotto i 1080px, 1 sotto i 640px) con foto 4:5, nome e prezzo grandi, bottone "Chiedi su WhatsApp". Il clic sulla foto apre un visore (`<dialog>`) con foto intera, frecce, swipe, ←/→ e link condivisibile `catalogo.html#id-capo`; dalla home ogni foto porta al capo nel visore.
@@ -166,6 +166,6 @@ Cornice 9:16, barre di avanzamento segmentate (5.2s lineari), "NEW DROP 01/06", 
 ### Don't:
 - Non introdurre un colore d'accento o gradienti decorativi.
 - Non mettere etichette o eyebrow sopra i titoli.
-- Non usare dissolvenze lunghe per i cambi di contenuto: si taglia.
+- Non aggiungere contenuti che il negozio dovrebbe produrre a parte (reel, video, storie).
 - Non usare Great Vibes per testo che va letto.
 - Non inventare recensioni, numeri di clienti o promozioni.

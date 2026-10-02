@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Novum Store · Abbigliamento streetwear a Cosenza</title>
-  <meta name="description" content="Novum Store Abbigliamento: streetwear a Cosenza, in Piazza Fausto e Luigi Gullo 22. Nuovi drop, camicie con strass, grafiche, denim. Info su WhatsApp.">
+  <meta name="description" content="Novum Store Abbigliamento: streetwear a Cosenza, in Piazza Fausto e Luigi Gullo 22. Camicie con strass, grafiche, denim. Info su WhatsApp.">
   <meta name="theme-color" content="#0a0a0a">
   <meta property="og:title" content="Novum Store · Abbigliamento">
-  <meta property="og:description" content="Streetwear a Cosenza. Un drop alla volta.">
+  <meta property="og:description" content="Streetwear a Cosenza. Guarda i capi e chiedi su WhatsApp.">
   <meta property="og:image" content="img/ig/ig01.jpg">
   <link rel="icon" href="img/ig/logo.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,7 +42,7 @@
       <span class="brand__caps">Abbigliamento</span>
     </a>
     <nav class="bar__nav" aria-label="Sezioni">
-      <a href="#drop">Ultimi arrivi</a>
+      <a href="#capi">Ultimi arrivi</a>
       <a href="catalogo.html">Catalogo</a>
       <a href="#negozio">Negozio</a>
       <a href="#contatti">Contatti</a>
@@ -54,13 +54,13 @@
   </header>
 
   <main>
-    <section class="hero" id="drop" aria-labelledby="hero-title">
+    <section class="hero" id="home" aria-labelledby="hero-title">
       <div class="hero__copy">
         <div class="wordmark" data-strass>
           <canvas aria-hidden="true"></canvas>
           <span class="wordmark__fallback" aria-hidden="true">NOVUM</span>
         </div>
-        <h1 id="hero-title" class="hero__title">Lo streetwear di Cosenza, un drop alla volta.</h1>
+        <h1 id="hero-title" class="hero__title">Lo streetwear di Cosenza, in vetrina.</h1>
         <p class="hero__lede">Camicie con strass, grafiche, denim e set completi. Passa in negozio o scrivici: ti diciamo taglie e disponibilità.</p>
 
         <ul class="facts" role="list">
@@ -77,29 +77,16 @@
         </div>
       </div>
 
-      <div class="reel" data-reel aria-roledescription="carosello" aria-label="Ultimi arrivi" tabindex="0">
-        <div class="reel__bars" data-reel-bars aria-hidden="true"></div>
-        <div class="reel__top">
-          <p class="reel__drop"><span>New drop</span> <span class="reel__count" data-reel-count>01/06</span></p>
-          <button type="button" class="reel__pause" data-reel-pause aria-label="Metti in pausa">
-            <svg class="ico"><use href="#i-pause"/></svg>
-          </button>
-        </div>
-        <div class="reel__frames" data-reel-frames aria-live="off"></div>
-        <button type="button" class="reel__zone reel__zone--prev" data-reel-prev aria-label="Capo precedente"></button>
-        <button type="button" class="reel__zone reel__zone--next" data-reel-next aria-label="Capo successivo"></button>
-      </div>
+      <article class="latest" data-latest aria-label="Ultimo arrivo"></article>
     </section>
 
     <section class="catalog" id="capi" aria-labelledby="capi-title">
       <div class="section-head">
-        <h2 id="capi-title" class="h2">I capi in negozio</h2>
-        <p class="section-head__note">Ogni capo è disponibile in negozio. Per taglie e disponibilità premi <em>Chiedi</em>: si apre WhatsApp con il messaggio già scritto.</p>
+        <h2 id="capi-title" class="h2">Ultimi arrivi</h2>
+        <p class="section-head__note">Tutti i capi sono in negozio. Per taglia e disponibilità premi <em>Chiedi</em>: si apre WhatsApp con il messaggio già scritto.</p>
       </div>
-      <div class="filters" role="group" aria-label="Filtra per categoria" data-filters></div>
-      <p class="catalog__count" data-count aria-live="polite"></p>
       <ul class="grid" role="list" data-grid></ul>
-      <div class="catalog__more"><a class="btn btn--solid btn--lg" href="catalogo.html"><span>Apri il catalogo completo</span><svg class="ico"><use href="#i-arrow"/></svg></a></div>
+      <div class="catalog__more"><a class="btn btn--solid btn--lg" href="catalogo.html"><span data-more-label>Vedi tutto il catalogo</span><svg class="ico"><use href="#i-arrow"/></svg></a></div>
     </section>
 
     <section class="store" id="negozio" aria-labelledby="negozio-title">
@@ -172,9 +159,6 @@
   <div class="shortcuts" id="shortcuts" popover aria-labelledby="sc-title">
     <h2 id="sc-title">Scorciatoie</h2>
     <dl>
-      <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Capo precedente / successivo</dd></div>
-      <div><dt><kbd>Spazio</kbd></dt><dd>Pausa / riprendi gli arrivi</dd></div>
-      <div><dt><kbd>1</kbd>–<kbd>6</kbd></dt><dd>Filtra le categorie</dd></div>
       <div><dt><kbd>?</kbd></dt><dd>Apri / chiudi questo pannello</dd></div>
       <div><dt><kbd>↑↑↓↓←→←→ B A</kbd></dt><dd>Non dovresti saperlo.</dd></div>
     </dl>
@@ -184,6 +168,7 @@
   <p class="toast" data-toast role="status" aria-live="polite"></p>
   <canvas class="trail" data-trail aria-hidden="true"></canvas>
 
+  <script src="capi.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>
