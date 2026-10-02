@@ -149,8 +149,8 @@ Barra fissa ink al 92% con blur, logo in corsivo + ABBIGLIAMENTO, link oak che d
 ### Muro di capi (home)
 L'hero è a tutto schermo: dietro, colonne verticali di foto dei capi (4 su desktop, 2 su tablet, 1 su telefono) con 2px di separazione. Ogni 2.6s una colonna alla volta, in sequenza, passa al capo successivo di `capi.js` con una tendina che sale (clip-path, 1.1s) e un lento zoom 1.1→1 su 9s. Sopra: sfumature nere in alto e in basso, logo a strass, titolo in maiuscolo wdth 122 e due bottoni (catalogo pieno, WhatsApp vetro scuro; su telefono solo il catalogo, WhatsApp sta nella barra in basso). Nessun controllo: le colonne sono solo cliccabili verso il capo nel catalogo. Si ferma fuori schermo e con prefers-reduced-motion.
 
-### Ultimi arrivi: capi appesi (home)
-I primi 8 capi di `capi.js` appesi a una stecca metallica (barra scura con sfumatura) con una gruccia disegnata in SVG sopra ogni foto verticale 3:4. Sotto ogni foto un **cartellino** color paper, ruotato di -1.6° (si raddrizza al passaggio), con foro punzonato, nome in maiuscolo, prezzo e "Chiedi". Ultimo elemento: "Tutto il catalogo". Scorrimento orizzontale con snap: trascinamento col mouse, frecce rotonde su desktop, swipe su telefono (capi a 68vw). La larghezza dei capi dipende anche dall'altezza dello schermo, così le foto non vengono mai schiacciate.
+### Ultimi arrivi (home)
+I primi 4 capi di `capi.js` in una griglia pulita: foto verticali 3:4 intere (mai schiacciate: la griglia si restringe sugli schermi bassi), sotto nome e prezzo, poi "Chiedi su WhatsApp"; bottone "Vai al catalogo". Su telefono 2×2 con solo foto, nome e prezzo. Le grucce/cartellini scorrevoli sono stati provati e scartati dal cliente (troppo effetto, poco professionale).
 
 ### Menu e barra in basso
 Sotto i 1080px il menu del header diventa un pulsante "Menu" che apre un pannello a tutto schermo con voci giganti in maiuscolo (wdth 125), stato del negozio e WhatsApp. Su telefono la barra fissa in basso ha tre voci: Catalogo (Home nel catalogo), WhatsApp in evidenza, Indicazioni. Lo stato in alto usa una forma breve ("Aperto · 20:00").

@@ -156,59 +156,22 @@
     build();
   }
 
-  /* ---------------- Ultimi arrivi: capi appesi (home) ---------------- */
+  /* ---------------- Ultimi arrivi (home) ---------------- */
   let setFilter = () => {};
-  const RAIL_COUNT = 8;
-  const HANGER = `<svg class="hang__hanger" viewBox="0 0 120 44" aria-hidden="true"><path d="M60 18V12a6 6 0 1 0-6-6"/><path d="M60 18 6 40h108Z"/></svg>`;
-  function initRail() {
-    const track = $("[data-rail]"); if (!track) return;
-    const items = ITEMS.slice(0, RAIL_COUNT);
-    track.innerHTML = items.map((it) => `
-      <li class="hang">
-        ${HANGER}
-        <a class="hang__photo" href="catalogo.html#${it.id}" draggable="false">
-          <img src="${esc(it.img)}" alt="${esc(it.alt)}" style="object-position:${it.pos}" loading="lazy" width="360" height="640" draggable="false">
+  const ARRIVALS_COUNT = 4;
+  function initArrivals() {
+    const grid = $("[data-arrivals]"); if (!grid) return;
+    grid.innerHTML = ITEMS.slice(0, ARRIVALS_COUNT).map((it) => `
+      <li class="arr">
+        <a class="arr__photo" href="catalogo.html#${it.id}" aria-label="Vedi ${esc(it.name)} nel catalogo">
+          <img src="${esc(it.img)}" alt="${esc(it.alt)}" style="object-position:${it.pos}" loading="lazy" width="360" height="640">
         </a>
-        <div class="tag">
-          <a class="tag__name" href="catalogo.html#${it.id}" draggable="false">${esc(it.name)}</a>
-          <span class="tag__price">${euro(it.price)}</span>
-          <a class="tag__ask" href="${askLink(it)}" target="_blank" rel="noopener" draggable="false">Chiedi<svg class="ico"><use href="#i-arrow"/></svg></a>
+        <div class="arr__info">
+          <h3 class="arr__name"><a href="catalogo.html#${it.id}">${esc(it.name)}</a></h3>
+          <p class="arr__price">${euro(it.price)}</p>
         </div>
-      </li>`).join("") + `
-      <li class="hang hang--more">
-        ${HANGER}
-        <a class="hang__all" href="catalogo.html" draggable="false"><span>Tutto il catalogo</span><svg class="ico"><use href="#i-arrow"/></svg></a>
-      </li>`;
-
-    const prev = $("[data-rail-prev]"), next = $("[data-rail-next]"), nav = $("[data-rail-nav]");
-    const stepPx = () => { const li = track.querySelector(".hang"); return li ? li.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0) : 300; };
-    const sync = () => {
-      const max = track.scrollWidth - track.clientWidth - 2;
-      if (nav) nav.hidden = max <= 0;
-      if (prev) prev.disabled = track.scrollLeft <= 2;
-      if (next) next.disabled = track.scrollLeft >= max;
-    };
-    prev && prev.addEventListener("click", () => track.scrollBy({ left: -stepPx() * 2, behavior: REDUCED ? "auto" : "smooth" }));
-    next && next.addEventListener("click", () => track.scrollBy({ left: stepPx() * 2, behavior: REDUCED ? "auto" : "smooth" }));
-    track.addEventListener("scroll", sync, { passive: true });
-    addEventListener("resize", sync);
-    track.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowRight") { e.preventDefault(); track.scrollBy({ left: stepPx(), behavior: "smooth" }); }
-      if (e.key === "ArrowLeft") { e.preventDefault(); track.scrollBy({ left: -stepPx(), behavior: "smooth" }); }
-    });
-
-    // trascina col mouse (su touch scorre già da sé)
-    let down = false, moved = false, sx = 0, sl = 0;
-    track.addEventListener("pointerdown", (e) => { if (e.pointerType !== "mouse" || e.button !== 0) return; down = true; moved = false; sx = e.clientX; sl = track.scrollLeft; });
-    addEventListener("pointermove", (e) => {
-      if (!down) return;
-      const dx = e.clientX - sx;
-      if (!moved && Math.abs(dx) > 6) { moved = true; track.classList.add("is-dragging"); }
-      if (moved) track.scrollLeft = sl - dx;
-    });
-    addEventListener("pointerup", () => { if (!down) return; down = false; setTimeout(() => track.classList.remove("is-dragging"), 0); });
-    track.addEventListener("click", (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
-    requestAnimationFrame(sync);
+        <a class="arr__ask" href="${askLink(it)}" target="_blank" rel="noopener">Chiedi su WhatsApp<svg class="ico"><use href="#i-arrow"/></svg></a>
+      </li>`).join("");
   }
 
   /* ---------------- Menu (telefono e tablet) ---------------- */
@@ -544,7 +507,7 @@
   renderStatus();
   setInterval(renderStatus, 30_000);
   initWall();
-  initRail();
+  initArrivals();
   initMenu();
   initMap();
   initCatalogPage();

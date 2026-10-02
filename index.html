@@ -117,15 +117,9 @@
       <div class="arrivals__head">
         <h2 id="capi-title" class="h2">Ultimi arrivi</h2>
         <p class="arrivals__note">Tocca un capo per vederlo grande. Per taglia e disponibilità, scrivici su WhatsApp.</p>
-        <div class="arrivals__nav" data-rail-nav>
-          <button type="button" class="round-btn" data-rail-prev aria-label="Scorri indietro"><svg class="ico"><use href="#i-left"/></svg></button>
-          <button type="button" class="round-btn" data-rail-next aria-label="Scorri avanti"><svg class="ico"><use href="#i-right"/></svg></button>
-        </div>
       </div>
-      <div class="rail">
-        <div class="rail__bar" aria-hidden="true"></div>
-        <ul class="rail__track" role="list" data-rail tabindex="0" aria-label="Ultimi arrivi, scorri in orizzontale"></ul>
-      </div>
+      <ul class="arrivals__grid" role="list" data-arrivals></ul>
+      <div class="arrivals__more"><a class="btn btn--solid btn--lg" href="catalogo.html"><span>Vai al catalogo</span><svg class="ico"><use href="#i-arrow"/></svg></a></div>
     </section>
 
     <section class="store" id="negozio" aria-labelledby="negozio-title">
