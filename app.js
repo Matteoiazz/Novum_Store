@@ -1,4 +1,4 @@
-/* Novum Store — vetrina demo */
+/* Novum Store */
 (() => {
   "use strict";
 
@@ -6,35 +6,44 @@
   const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches || /[?&]still\b/.test(location.search);
   const FINE_POINTER = matchMedia("(pointer: fine)").matches;
 
-  // I capi si modificano in capi.js
-  const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  // I capi si modificano in capi.js (il primo dell'elenco è il più nuovo)
+  const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const FOCUS = { alto: "50% 12%", centro: "50% 45%", basso: "50% 85%" };
   const CAT_LABELS = window.NOVUM_CATEGORIE || {};
+  const seen = new Set();
   const ITEMS = (window.NOVUM_CAPI || [])
-    .map((c) => ({ id: slug(c.nome), name: c.nome, cat: c.categoria, price: Number(c.prezzo), img: c.foto, date: c.data, alt: c.nome }))
-    .sort((x, y) => y.date.localeCompare(x.date));
+    .filter((c) => c && c.nome && c.foto)
+    .map((c) => {
+      let id = slug(c.nome) || "capo"; while (seen.has(id)) id += "-2"; seen.add(id);
+      return { id, name: c.nome, cat: c.categoria, price: Number(c.prezzo), img: c.foto, alt: c.nome, pos: FOCUS[c.inquadratura] || "50% 40%" };
+    });
   const CATS = [{ id: "all", label: "Tutto" }].concat(
     Object.keys(CAT_LABELS).filter((k) => ITEMS.some((i) => i.cat === k)).map((k) => ({ id: k, label: CAT_LABELS[k] }))
   );
-  const catLabelOf = (id) => CAT_LABELS[id] || id;
+  const catLabelOf = (id) => CAT_LABELS[id] || "";
   const HOME_COUNT = 4;
 
   // Orari (ora di Roma). Giorni: 0 = domenica.
   const HOURS = { 1: [[600, 780], [960, 1200]], 2: [[600, 780], [960, 1200]], 3: [[600, 780], [960, 1200]], 4: [[600, 780], [960, 1200]], 5: [[600, 780], [960, 1200]], 6: [[600, 780], [960, 1200]], 0: [] };
-  const CLOSURES = [{ from: "2026-08-07", to: "2026-08-26", note: "chiusura estiva" }];
+  // Chiusure straordinarie (ferie): aggiungi { from: "AAAA-MM-GG", to: "AAAA-MM-GG" }
+  const CLOSURES = [];
   const DAY_NAMES = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
+  const DAY_SHORT = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
 
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-  const euro = (n) => new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
+  const euro = (n) => (Number.isFinite(n) ? new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n) : "");
   const waLink = (text) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+  const askLink = (it) => waLink(`Ciao Novum! Vorrei info su: ${it.name}. Taglia: `);
   const pad = (n) => String(n).padStart(2, "0");
   const hhmm = (m) => `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   /* ---------------- Time in Rome ---------------- */
   function romeNow() {
     const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
       timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", hourCycle: "h23", weekday: "short"
+      hour: "2-digit", minute: "2-digit", hourCycle: "h23"
     }).formatToParts(new Date()).map((p) => [p.type, p.value]));
     const iso = `${parts.year}-${parts.month}-${parts.day}`;
     const dow = new Date(`${iso}T12:00:00Z`).getUTCDay();
@@ -46,22 +55,20 @@
 
   function shopStatus() {
     const now = romeNow();
-    const today = slotsFor(now.iso);
-    const cur = today.find(([a, b]) => now.min >= a && now.min < b);
+    const cur = slotsFor(now.iso).find(([a, b]) => now.min >= a && now.min < b);
     if (cur) {
       const left = cur[1] - now.min;
       const h = Math.floor(left / 60), m = left % 60;
       const span = h ? `${h} h ${pad(m)} min` : `${m} min`;
-      return { open: true, short: `Aperto · chiude tra ${span}`, big: "Aperto ora", next: `Chiude alle ${hhmm(cur[1])}, tra ${span}.` };
+      return { open: true, short: `Aperto · fino alle ${hhmm(cur[1])}`, big: "Aperto ora", next: `Chiude alle ${hhmm(cur[1])}, tra ${span}.` };
     }
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 30; i++) {
       const iso = addDays(now.iso, i);
       const s = slotsFor(iso).find(([a]) => i > 0 || a > now.min);
       if (s) {
         const dow = new Date(`${iso}T12:00:00Z`).getUTCDay();
         const when = i === 0 ? "oggi" : i === 1 ? "domani" : DAY_NAMES[dow];
-        const closure = closedOn(now.iso);
-        return { open: false, short: `Chiuso · riapre ${when} ${hhmm(s[0])}`, big: closure ? "Chiuso per ferie" : "Ora chiuso", next: `Riapre ${when} alle ${hhmm(s[0])}.` };
+        return { open: false, short: `Chiuso · apre ${i === 0 ? "" : when + " "}alle ${hhmm(s[0])}`, big: closedOn(now.iso) ? "Chiuso per ferie" : "Ora chiuso", next: `Riapre ${when} alle ${hhmm(s[0])}.` };
       }
     }
     return { open: false, short: "Chiuso", big: "Ora chiuso", next: "" };
@@ -79,103 +86,117 @@
   function renderHours() {
     const tb = $("[data-hours]"); if (!tb) return;
     const { dow } = romeNow();
-    const fmt = (d) => (HOURS[d].length ? HOURS[d].map(([a, b]) => `${hhmm(a)}–${hhmm(b)}`).join(" · ") : "Chiuso");
-    const cap = (s) => s[0].toUpperCase() + s.slice(1);
-    // raggruppa i giorni consecutivi con lo stesso orario (lun→dom)
+    const fmt = (d) => (HOURS[d].length ? HOURS[d].map(([a, b]) => `${hhmm(a)}–${hhmm(b)}`).join("<br>") : "Chiuso");
     const groups = [];
     [1, 2, 3, 4, 5, 6, 0].forEach((d) => {
       const last = groups[groups.length - 1];
       if (last && last.txt === fmt(d)) last.days.push(d); else groups.push({ days: [d], txt: fmt(d) });
     });
     tb.innerHTML = groups.map((g) => {
-      const name = g.days.length > 1 ? `${cap(DAY_NAMES[g.days[0]])}–${DAY_NAMES[g.days[g.days.length - 1]]}` : cap(DAY_NAMES[g.days[0]]);
+      const name = g.days.length > 1 ? `${DAY_SHORT[g.days[0]]}–${DAY_SHORT[g.days[g.days.length - 1]]}` : DAY_NAMES[g.days[0]][0].toUpperCase() + DAY_NAMES[g.days[0]].slice(1);
       return `<tr class="${g.days.includes(dow) ? "is-today" : ""}"><th scope="row">${name}</th><td>${g.txt}</td></tr>`;
     }).join("");
   }
 
-  /* ---------------- Relative dates ---------------- */
-  const rtf = new Intl.RelativeTimeFormat("it", { numeric: "auto" });
-  function since(iso) {
-    const today = romeNow().iso;
-    const days = Math.round((Date.parse(`${today}T12:00:00Z`) - Date.parse(`${iso}T12:00:00Z`)) / 864e5);
-    if (days < 14) return rtf.format(-days, "day");
-    if (days < 60) return rtf.format(-Math.round(days / 7), "week");
-    return rtf.format(-Math.round(days / 30), "month");
-  }
-  const dateLabel = (iso) => new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "short" }).format(new Date(`${iso}T12:00:00Z`));
-
-  /* ---------------- Ultimo arrivo (home) ---------------- */
-  function initLatest() {
-    const box = $("[data-latest]"); if (!box || !ITEMS.length) return;
-    const it = ITEMS[0];
+  /* ---------------- Vetrina che ruota (home) ---------------- */
+  function initShowcase() {
+    const box = $("[data-show]"); if (!box || !ITEMS.length) { if (box) box.hidden = true; return; }
+    const DUR = 4500;
     box.innerHTML = `
-      <a class="latest__media" href="catalogo.html#${it.id}" aria-label="Vedi ${it.name} nel catalogo">
-        <img src="${it.img}" alt="${it.alt}" width="360" height="640">
-      </a>
-      <div class="latest__body">
-        <p class="latest__when">Ultimo arrivo · <time datetime="${it.date}">${since(it.date)}</time></p>
-        <h2 class="latest__name">${it.name}</h2>
-        <div class="latest__row">
-          <p class="price">${euro(it.price)} <span class="price__demo">demo</span></p>
-          <a class="frame__ask" href="${waLink(`Ciao Novum! Vorrei info su: ${it.name}. Taglia: `)}" target="_blank" rel="noopener">Chiedi <svg class="ico"><use href="#i-arrow"/></svg></a>
-        </div>
+      <div class="show__slides">
+        ${ITEMS.map((it, i) => `
+          <a class="show__slide${i === 0 ? " is-on" : ""}" href="catalogo.html#${it.id}" ${i === 0 ? "" : 'tabindex="-1" aria-hidden="true"'}>
+            <img src="${esc(it.img)}" alt="${esc(it.alt)}" style="object-position:${it.pos}" ${i > 1 ? 'loading="lazy"' : ""} width="360" height="640">
+            <span class="show__cap">
+              <span class="show__cat">${esc(catLabelOf(it.cat))}</span>
+              <span class="show__name">${esc(it.name)}</span>
+              <span class="show__price">${euro(it.price)}</span>
+            </span>
+          </a>`).join("")}
+      </div>
+      <div class="show__bar">
+        <span class="show__count" aria-live="polite" data-show-count>1 / ${ITEMS.length}</span>
+        <span class="show__ctrls">
+          <button type="button" class="show__btn" data-show-prev aria-label="Capo precedente"><svg class="ico"><use href="#i-left"/></svg></button>
+          <button type="button" class="show__btn" data-show-next aria-label="Capo successivo"><svg class="ico"><use href="#i-right"/></svg></button>
+        </span>
       </div>`;
+    const slides = $$(".show__slide", box), count = $("[data-show-count]", box);
+    let idx = 0, timer = 0, held = false, visible = true;
+    function go(n) {
+      slides[idx].classList.remove("is-on"); slides[idx].setAttribute("aria-hidden", "true"); slides[idx].tabIndex = -1;
+      idx = (n + slides.length) % slides.length;
+      slides[idx].classList.add("is-on"); slides[idx].removeAttribute("aria-hidden"); slides[idx].removeAttribute("tabindex");
+      const img = $("img", slides[(idx + 1) % slides.length]); if (img) img.loading = "eager";
+      count.textContent = `${idx + 1} / ${slides.length}`;
+      plan();
+    }
+    function plan() {
+      clearTimeout(timer);
+      if (REDUCED || held || !visible || document.hidden || slides.length < 2) return;
+      timer = setTimeout(() => go(idx + 1), DUR);
+    }
+    $("[data-show-prev]", box).addEventListener("click", () => go(idx - 1));
+    $("[data-show-next]", box).addEventListener("click", () => go(idx + 1));
+    if (slides.length < 2) $(".show__ctrls", box).hidden = true;
+    box.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") { held = true; plan(); } });
+    box.addEventListener("pointerleave", () => { held = false; plan(); });
+    box.addEventListener("focusin", () => { held = true; plan(); });
+    box.addEventListener("focusout", () => { held = false; plan(); });
+    let sx = 0;
+    box.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; }, { passive: true });
+    box.addEventListener("touchend", (e) => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1)); }, { passive: true });
+    new IntersectionObserver(([en]) => { visible = en.isIntersecting; plan(); }, { threshold: 0.3 }).observe(box);
+    document.addEventListener("visibilitychange", plan);
+    plan();
   }
 
-  /* ---------------- Catalog ---------------- */
+  /* ---------------- Ultimi arrivi (home) ---------------- */
   let setFilter = () => {};
-  function initCatalog() {
+  function initLatestGrid() {
     const grid = $("[data-grid]"); if (!grid) return;
-    grid.innerHTML = ITEMS.slice(0, HOME_COUNT).map((it, i) => `
+    grid.innerHTML = ITEMS.slice(0, HOME_COUNT).map((it) => `
       <li class="item">
-        <a class="item__media" href="catalogo.html#${it.id}" aria-label="Vedi ${it.name} nel catalogo">
-          <img src="${it.img}" alt="${it.alt}" loading="lazy" width="360" height="640">
-          ${i < 3 ? '<span class="item__flag">Nuovo</span>' : ""}
+        <a class="item__media" href="catalogo.html#${it.id}" aria-label="Vedi ${esc(it.name)} nel catalogo">
+          <img src="${esc(it.img)}" alt="${esc(it.alt)}" style="object-position:${it.pos}" loading="lazy" width="360" height="640">
         </a>
         <div class="item__body">
-          <h3 class="item__name">${it.name}</h3>
-          <p class="price">${euro(it.price)} <span class="price__demo">demo</span></p>
-          <p class="item__cat">${catLabelOf(it.cat)} · arrivato ${since(it.date)}</p>
-          <a class="item__ask" href="${waLink(`Ciao Novum! Vorrei info su: ${it.name}. Taglia: `)}" target="_blank" rel="noopener">Chiedi su WhatsApp <svg class="ico"><use href="#i-arrow"/></svg></a>
+          <h3 class="item__name">${esc(it.name)}</h3>
+          <p class="price">${euro(it.price)}</p>
+          <p class="item__cat">${esc(catLabelOf(it.cat))}</p>
+          <a class="item__ask" href="${askLink(it)}" target="_blank" rel="noopener">Chiedi su WhatsApp <svg class="ico"><use href="#i-arrow"/></svg></a>
         </div>
       </li>`).join("");
     const more = $("[data-more-label]");
     if (more) more.textContent = `Vedi tutti i ${ITEMS.length} capi`;
   }
 
-  /* ---------------- Catalog page ---------------- */
+  /* ---------------- Catalogo ---------------- */
   let viewerApi = null;
   function initCatalogPage() {
     const list = $("[data-catalog]"); if (!list) return;
     const filters = $("[data-filters]"), count = $("[data-count]"), sortEl = $("[data-sort]");
     const dlg = $("[data-viewer]");
-    const newest = ITEMS.slice(0, 3).map((i) => i.id);
-    const catLabel = catLabelOf;
     let cat = "all", sort = "new", visible = [];
 
     function render() {
       visible = ITEMS.filter((it) => cat === "all" || it.cat === cat);
-      if (sort === "new") visible.sort((a, b) => b.date.localeCompare(a.date));
       if (sort === "price-asc") visible.sort((a, b) => a.price - b.price);
       if (sort === "price-desc") visible.sort((a, b) => b.price - a.price);
-      list.innerHTML = visible.map((it, i) => `
+      list.innerHTML = visible.length ? visible.map((it, i) => `
         <li class="card" id="capo-${it.id}">
           <button type="button" class="card__btn" data-open="${it.id}">
-            <span class="card__media"><img src="${it.img}" alt="${it.alt}" ${i > 7 ? 'loading="lazy"' : ""} width="360" height="640"></span>
-            <span class="card__name">${it.name}</span>
+            <span class="card__media"><img src="${esc(it.img)}" alt="${esc(it.alt)}" style="object-position:${it.pos}" ${i > 7 ? 'loading="lazy"' : ""} width="360" height="640"></span>
+            <span class="card__name">${esc(it.name)}</span>
             <span class="card__price">${euro(it.price)}</span>
-            ${newest.includes(it.id) ? '<span class="card__new">Nuovo</span>' : ""}
           </button>
-        </li>`).join("");
-      count.textContent = `${visible.length} ${visible.length === 1 ? "capo" : "capi"}${cat === "all" ? "" : ` · ${catLabel(cat)}`}`;
-      list.classList.remove("is-cutting"); void list.offsetWidth; list.classList.add("is-cutting");
+        </li>`).join("") : `<li class="cat-empty">Nessun capo in questa categoria al momento. <a href="${waLink("Ciao Novum! Cerco un capo che non vedo sul sito: ")}" target="_blank" rel="noopener">Chiedici su WhatsApp</a>.</li>`;
+      count.textContent = `${visible.length} ${visible.length === 1 ? "capo" : "capi"}`;
     }
 
-    filters.innerHTML = CATS.map((c, i) => {
-      const n = c.id === "all" ? ITEMS.length : ITEMS.filter((it) => it.cat === c.id).length;
-      return `<button type="button" class="chip" data-cat="${c.id}" aria-pressed="${i === 0}" title="Tasto ${i + 1}">${c.label} <span class="chip__n">${n}</span></button>`;
-    }).join("");
+    filters.innerHTML = CATS.map((c, i) => `<button type="button" class="chip" data-cat="${c.id}" aria-pressed="${i === 0}">${esc(c.label)}</button>`).join("");
     setFilter = (c) => {
+      if (!CATS.some((x) => x.id === c)) return;
       cat = c;
       $$(".chip", filters).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.cat === c)));
       render();
@@ -184,7 +205,7 @@
     sortEl.addEventListener("change", () => { sort = sortEl.value; render(); });
     list.addEventListener("click", (e) => { const b = e.target.closest("[data-open]"); if (b) open(b.dataset.open); });
 
-    // viewer
+    // visore
     let cur = null;
     const img = $("[data-viewer-img]", dlg);
     const pool = () => (visible.some((v) => v.id === cur) ? visible : ITEMS);
@@ -194,13 +215,11 @@
       const p = pool(), i = p.findIndex((x) => x.id === id);
       img.src = it.img; img.alt = it.alt;
       $("[data-viewer-name]", dlg).textContent = it.name;
-      $("[data-viewer-price]", dlg).innerHTML = `${euro(it.price)} <span class="price__demo">demo</span>`;
-      $("[data-viewer-cat]", dlg).textContent = catLabel(it.cat);
-      $("[data-viewer-date]", dlg).textContent = `${dateLabel(it.date)} · ${since(it.date)}`;
-      $("[data-viewer-pos]", dlg).textContent = `${pad(i + 1)}/${pad(p.length)}`;
-      $("[data-viewer-wa]", dlg).href = waLink(`Ciao Novum! Vorrei info su: ${it.name}. Taglia: `);
-      $("[data-viewer-share-label]", dlg).textContent = "Copia link del capo";
-      dlg.classList.remove("is-cutting"); void dlg.offsetWidth; dlg.classList.add("is-cutting");
+      $("[data-viewer-price]", dlg).textContent = euro(it.price);
+      $("[data-viewer-cat]", dlg).textContent = catLabelOf(it.cat);
+      $("[data-viewer-pos]", dlg).textContent = `${i + 1} / ${p.length}`;
+      $("[data-viewer-wa]", dlg).href = askLink(it);
+      $("[data-viewer-share-label]", dlg).textContent = "Copia link";
       history.replaceState(null, "", `#${id}`);
     }
     function step(d) {
@@ -220,12 +239,15 @@
     $("[data-viewer-next]", dlg).addEventListener("click", () => step(1));
     $("[data-viewer-share]", dlg).addEventListener("click", async () => {
       const url = `${location.origin}${location.pathname}#${cur}`;
-      try { await navigator.clipboard.writeText(url); $("[data-viewer-share-label]", dlg).textContent = "Link copiato"; }
-      catch (_) { $("[data-viewer-share-label]", dlg).textContent = url; }
+      const label = $("[data-viewer-share-label]", dlg);
+      try {
+        if (navigator.share && !FINE_POINTER) { await navigator.share({ title: $("[data-viewer-name]", dlg).textContent, url }); return; }
+        await navigator.clipboard.writeText(url); label.textContent = "Link copiato";
+      } catch (_) { /* condivisione annullata */ }
     });
     let sx = 0;
-    dlg.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; }, { passive: true });
-    dlg.addEventListener("touchend", (e) => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1); }, { passive: true });
+    $(".viewer__media", dlg).addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; }, { passive: true });
+    $(".viewer__media", dlg).addEventListener("touchend", (e) => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1); }, { passive: true });
     viewerApi = { isOpen: () => dlg.open, step };
 
     render();
@@ -394,41 +416,33 @@
     const pop = $("#shortcuts");
     const KONAMI = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
     let k = 0;
-    $("[data-shortcuts-open]")?.addEventListener("click", () => pop.togglePopover?.());
-    addEventListener("keydown", (e) => {
+        addEventListener("keydown", (e) => {
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
       k = key === KONAMI[k] ? k + 1 : key === KONAMI[0] ? 1 : 0;
       if (k === KONAMI.length) { k = 0; toggleStrass(); return; }
 
       const tag = (e.target.tagName || "").toLowerCase();
       if (e.metaKey || e.ctrlKey || e.altKey || tag === "input" || tag === "textarea" || e.target.isContentEditable) return;
-      if (e.key === "?") { e.preventDefault(); pop.togglePopover?.(); return; }
+      if (e.key === "?" && pop) { e.preventDefault(); pop.togglePopover?.(); return; }
       if (viewerApi && viewerApi.isOpen()) {
         if (e.key === "ArrowRight") viewerApi.step(1);
         else if (e.key === "ArrowLeft") viewerApi.step(-1);
         return;
       }
-      if (/^[1-6]$/.test(e.key)) { const c = CATS[Number(e.key) - 1]; if (c) setFilter(c.id); }
+      if (/^[1-9]$/.test(e.key)) { const c = CATS[Number(e.key) - 1]; if (c) setFilter(c.id); }
     });
   }
 
   /* ---------------- Misc ---------------- */
   function initMisc() {
-    // generic WhatsApp links get a friendly prefilled message
     $$("a[data-wa]").forEach((a) => (a.href = waLink("Ciao Novum! Ho visto il sito e vorrei qualche info.")));
+    document.documentElement.style.setProperty("--strip-h", "0px");
 
-    const strip = $("#demoStrip");
-    const syncStrip = () => document.documentElement.style.setProperty("--strip-h", strip.hidden ? "0px" : `${strip.offsetHeight}px`);
-    new ResizeObserver(syncStrip).observe(strip);
-    try { if (sessionStorage.getItem("novum-demo-hide")) strip.hidden = true; } catch (_) {}
-    syncStrip();
-    $(".demo-strip__close", strip).addEventListener("click", () => { strip.hidden = true; syncStrip(); try { sessionStorage.setItem("novum-demo-hide", "1"); } catch (_) {} });
-
-    // nav: mark the section in view
+    // menu: evidenzia la sezione visibile (solo in home)
     const navObserver = new IntersectionObserver((ens) => {
       ens.forEach((en) => {
         if (!en.isIntersecting) return;
-        $$(".bar__nav a").forEach((a) => a.setAttribute("aria-current", String(a.getAttribute("href") === `#${en.target.id}`)));
+        $$(".bar__nav a").forEach((a) => { if (a.getAttribute("href").startsWith("#")) a.setAttribute("aria-current", String(a.getAttribute("href") === `#${en.target.id}`)); });
       });
     }, { rootMargin: "-45% 0px -50% 0px" });
     ["home", "capi", "negozio", "contatti"].forEach((id) => { const el = document.getElementById(id); if (el) navObserver.observe(el); });
@@ -442,14 +456,14 @@
       "|_|\\_|\\___/   \\_/   \\___/ |_|  |_|",
     ].join("\n");
     console.log(`%c${art}`, "font-family:monospace;color:#f6f4f0;background:#0a0a0a;padding:8px 12px;line-height:1.2");
-    console.log("%cCiao smanettone. Hai aperto la console di un negozio di vestiti.\nPremi ? sul sito per le scorciatoie. E c'è un codice che i gamer conoscono…", "color:#d8d2c8;font:13px system-ui");
+    console.log("%cCiao smanettone. Hai aperto la console di un negozio di vestiti.\nProva a premere ? sul sito. E c'è un codice che i gamer conoscono…", "color:#d8d2c8;font:13px system-ui");
   }
 
   /* ---------------- Boot ---------------- */
   renderStatus();
   setInterval(renderStatus, 30_000);
-  initLatest();
-  initCatalog();
+  initShowcase();
+  initLatestGrid();
   initCatalogPage();
   initStrass();
   initKeys(initStrassMode());

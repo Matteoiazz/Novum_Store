@@ -122,7 +122,7 @@ Un'unica famiglia variabile, **Archivo**, usata sull'asse della larghezza: wdth 
 
 ## Layout
 
-Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra − striscia demo); logo a strass, titolo, scheda Ultimo arrivo e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, titolo, Ultimo arrivo, poi testo e azioni. Home: una riga con i 4 capi più recenti e un bottone verso il catalogo. Ogni sezione della home sta in una schermata sotto la barra (foto e spaziature limitate in `svh`, `--sec-pad`); orari raggruppati (Lunedì–Sabato / Domenica) e mappa accanto all'indirizzo. Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
+Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra − striscia demo); logo a strass, titolo, scheda Ultimo arrivo e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, titolo, Ultimo arrivo, poi testo e azioni. Home: una riga con i primi 4 capi di `capi.js` e un bottone verso il catalogo. Ogni sezione della home sta in una schermata sotto la barra (foto e spaziature limitate in `svh`, `--sec-pad`); orari raggruppati (Lunedì–Sabato / Domenica) e mappa accanto all'indirizzo. Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
 
 ## Elevation & Depth
 
@@ -146,8 +146,11 @@ Foto 3:4 su ink-3, raggio 12px, pillola "Nuovo" sui 3 arrivi più recenti, nome 
 ### Navigation
 Barra fissa ink al 92% con blur, logo in corsivo + ABBIGLIAMENTO, link oak che diventano paper con sottolineatura, stato del negozio dal vivo, bottone WhatsApp.
 
-### Ultimo arrivo (home)
-Scheda 9:16 accanto al titolo: foto del capo più recente in `capi.js`, sfumatura in basso, "ULTIMO ARRIVO · quando", nome in maiuscolo wdth 125, prezzo e "Chiedi". Si aggiorna da sola; nessun contenuto da gestire a parte.
+### Vetrina che ruota (home)
+Scheda accanto al titolo (sotto il titolo su mobile) che mostra a rotazione **tutti** i capi di `capi.js` con dissolvenza di 700ms ogni 4.5s: foto, categoria, nome in maiuscolo wdth 122, prezzo. Barra sotto la foto con "1 / N" e frecce; swipe su touch; si ferma al passaggio del mouse, col focus, fuori schermo e con prefers-reduced-motion. Il clic apre il capo nel catalogo.
+
+### Ultimi arrivi (home)
+I primi 4 capi di `capi.js` (chi è in cima è il più nuovo), senza date né bollini, con categoria e "Chiedi su WhatsApp". Ogni foto usa l'`inquadratura` del capo come `object-position`.
 
 ### Pagina Catalogo (eccezione voluta: zero estetica)
 `catalogo.html` non segue il mondo nero della home: su richiesta del cliente è neutra come un e-commerce tipo Zara, così contano solo i capi. Fondo bianco, testo nero, griglia di foto **quadrate** quasi a filo (4 colonne, 3 sotto i 1080px, 2 sotto i 760px), sotto solo nome in maiuscolo e prezzo a 12px. Filtri come testo sottolineato, ordinamento come testo, bottoni rettangolari neri. Il clic su un capo apre il visore (`<dialog>`) bianco con foto intera, frecce, swipe, ←/→, "Chiedi su WhatsApp" e link condivisibile `catalogo.html#id-capo`. Implementato come override dei token sotto `.page-catalog`.
@@ -160,7 +163,7 @@ Scheda 9:16 accanto al titolo: foto del capo più recente in `capi.js`, sfumatur
 ### Do:
 - Mostra sempre prezzo, stato del negozio e un modo per scrivere su WhatsApp entro un tocco.
 - Usa le foto vere del negozio e delle persone che ci passano.
-- Etichetta come DEMO ogni dato dimostrativo.
+- Niente segnali da sito non finito: niente etichette demo, date che invecchiano o testi segnaposto.
 - Tieni la prima schermata desktop dentro il viewport.
 
 ### Don't:

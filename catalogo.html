@@ -25,10 +25,6 @@
 
   <a class="skip" href="#lista">Salta alla lista dei capi</a>
 
-  <div class="demo-strip" id="demoStrip" role="note">
-    <p><strong>Anteprima demo.</strong> Prezzi e nomi dei capi sono indicativi; le foto vengono dal profilo Instagram del negozio.</p>
-    <button type="button" class="demo-strip__close" aria-label="Chiudi avviso demo"><svg class="ico"><use href="#i-x"/></svg></button>
-  </div>
 
   <header class="bar" id="top">
     <a class="brand" href="index.html" aria-label="Novum Store, vai alla home">
@@ -51,7 +47,7 @@
     <div class="cat-head">
       <a class="back" href="index.html"><svg class="ico"><use href="#i-left"/></svg><span>Home</span></a>
       <h1 class="cat-head__title">Catalogo</h1>
-      <p class="cat-head__lede">Tocca un capo per vederlo grande e chiedere su <em>WhatsApp</em>. Prezzi indicativi.</p>
+      <p class="cat-head__lede">Tocca un capo per vederlo grande e chiedere su <em>WhatsApp</em>.</p>
     </div>
 
     <div class="toolbar" data-toolbar>
@@ -59,7 +55,7 @@
       <label class="sort">
         <span>Ordina</span>
         <select data-sort>
-          <option value="new">Più recenti</option>
+          <option value="new">Ultimi arrivi</option>
           <option value="price-asc">Prezzo: dal più basso</option>
           <option value="price-desc">Prezzo: dal più alto</option>
         </select>
@@ -73,10 +69,6 @@
   <footer class="foot">
     <p class="foot__script">Novum Store</p>
     <p class="foot__line">Abbigliamento · Piazza Fausto e Luigi Gullo 22, Cosenza · Lun–Sab 10–13 / 16–20</p>
-    <p class="foot__meta">
-      <span>Prezzi dimostrativi, da confermare in negozio.</span>
-      <button type="button" class="kbd-hint" data-shortcuts-open>Premi <kbd>?</kbd> per le scorciatoie</button>
-    </p>
   </footer>
 
   <nav class="dock" aria-label="Azioni rapide">
@@ -97,12 +89,11 @@
       <p class="viewer__price" data-viewer-price></p>
       <dl class="viewer__facts">
         <div><dt>Categoria</dt><dd data-viewer-cat></dd></div>
-        <div><dt>Arrivato</dt><dd data-viewer-date></dd></div>
         <div><dt>Dove</dt><dd>In negozio, Piazza Fausto e Luigi Gullo 22</dd></div>
       </dl>
       <div class="viewer__actions">
         <a class="btn btn--solid btn--lg" data-viewer-wa href="#" target="_blank" rel="noopener"><svg class="ico"><use href="#i-chat"/></svg><span>Chiedi su WhatsApp</span></a>
-        <button type="button" class="btn btn--line btn--lg" data-viewer-share><span data-viewer-share-label>Copia link del capo</span></button>
+        <button type="button" class="btn btn--line btn--lg" data-viewer-share><span data-viewer-share-label>Copia link</span></button>
       </div>
     </div>
   </dialog>
@@ -112,7 +103,7 @@
     <dl>
       <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Capo precedente / successivo (foto aperta)</dd></div>
       <div><dt><kbd>Esc</kbd></dt><dd>Chiudi la foto</dd></div>
-      <div><dt><kbd>1</kbd>–<kbd>6</kbd></dt><dd>Filtra le categorie</dd></div>
+      <div><dt><kbd>1</kbd>–<kbd>9</kbd></dt><dd>Filtra le categorie</dd></div>
       <div><dt><kbd>?</kbd></dt><dd>Apri / chiudi questo pannello</dd></div>
       <div><dt><kbd>↑↑↓↓←→←→ B A</kbd></dt><dd>Non dovresti saperlo.</dd></div>
     </dl>

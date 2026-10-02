@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Novum Store · Abbigliamento streetwear a Cosenza</title>
-  <meta name="description" content="Novum Store Abbigliamento: streetwear a Cosenza, in Piazza Fausto e Luigi Gullo 22. Camicie con strass, grafiche, denim. Info su WhatsApp.">
+  <meta name="description" content="Novum Store Abbigliamento: streetwear a Cosenza, in Piazza Fausto e Luigi Gullo 22. Guarda il catalogo e chiedi taglie e disponibilità su WhatsApp.">
   <meta name="theme-color" content="#0a0a0a">
   <meta property="og:title" content="Novum Store · Abbigliamento">
   <meta property="og:description" content="Streetwear a Cosenza. Guarda i capi e chiedi su WhatsApp.">
@@ -26,15 +26,13 @@
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14"/><path d="M16 5v14"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5Z"/></symbol>
     <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
   </svg>
 
   <a class="skip" href="#capi">Salta ai capi</a>
 
-  <div class="demo-strip" id="demoStrip" role="note">
-    <p><strong>Anteprima demo.</strong> Prezzi e nomi dei capi sono indicativi; le foto vengono dal profilo Instagram del negozio.</p>
-    <button type="button" class="demo-strip__close" aria-label="Chiudi avviso demo"><svg class="ico"><use href="#i-x"/></svg></button>
-  </div>
 
   <header class="bar" id="top">
     <a class="brand" href="#top" aria-label="Novum Store, torna su">
@@ -61,7 +59,7 @@
           <span class="wordmark__fallback" aria-hidden="true">NOVUM</span>
         </div>
         <h1 id="hero-title" class="hero__title">Lo streetwear di Cosenza, in vetrina.</h1>
-        <p class="hero__lede">Camicie con strass, grafiche, denim e set completi. Passa in negozio o scrivici: ti diciamo taglie e disponibilità.</p>
+        <p class="hero__lede">Scegli il capo dal catalogo, scrivici su WhatsApp e passa a provarlo in negozio.</p>
 
         <ul class="facts" role="list">
           <li><svg class="ico"><use href="#i-clock"/></svg><span data-status-long>Lun–Sab 10:00–13:00 · 16:00–20:00</span></li>
@@ -77,7 +75,7 @@
         </div>
       </div>
 
-      <article class="latest" data-latest aria-label="Ultimo arrivo"></article>
+      <div class="show" data-show role="region" aria-roledescription="carosello" aria-label="Capi del catalogo"></div>
     </section>
 
     <section class="catalog" id="capi" aria-labelledby="capi-title">
@@ -142,10 +140,6 @@
   <footer class="foot">
     <p class="foot__script">Novum Store</p>
     <p class="foot__line">Abbigliamento · Piazza Fausto e Luigi Gullo 22, Cosenza · Lun–Sab 10–13 / 16–20</p>
-    <p class="foot__meta">
-      <span>Prezzi dimostrativi, da confermare in negozio.</span>
-      <button type="button" class="kbd-hint" data-shortcuts-open>Premi <kbd>?</kbd> per le scorciatoie</button>
-    </p>
   </footer>
 
   <nav class="dock" aria-label="Azioni rapide">
