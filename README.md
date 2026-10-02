@@ -1,4 +1,4 @@
-# Novum Store — vetrina (demo)
+# Novum Store — sito vetrina
 
 Sito statico, nessuna dipendenza. Online su https://novumstore-smoky.vercel.app
 

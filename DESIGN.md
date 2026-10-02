@@ -122,7 +122,7 @@ Un'unica famiglia variabile, **Archivo**, usata sull'asse della larghezza: wdth 
 
 ## Layout
 
-Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra − striscia demo); logo a strass, titolo, scheda Ultimo arrivo e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, titolo, Ultimo arrivo, poi testo e azioni. Home: una riga con i primi 4 capi di `capi.js` e un bottone verso il catalogo. Ogni sezione della home sta in una schermata sotto la barra (foto e spaziature limitate in `svh`, `--sec-pad`); orari raggruppati (Lunedì–Sabato / Domenica) e mappa accanto all'indirizzo. Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
+Contenitore massimo 1440px, gutter fluido 16–56px. Sezioni separate da un filetto e da 72–140px d'aria. La hero a due colonne occupa esattamente il viewport (`--fold` = altezza schermo − barra); logo a strass, titolo, vetrina che ruota e spaziature scalano in `svh`. Sotto i 900px la hero diventa una colonna: logo, titolo, vetrina che ruota, poi testo e azioni. Home: una riga con i primi 4 capi di `capi.js` e un bottone verso il catalogo. Ogni sezione della home sta in una schermata sotto la barra (foto e spaziature limitate in `svh`, `--sec-pad`); orari raggruppati (Lunedì–Sabato / Domenica) e mappa accanto all'indirizzo. Su mobile una barra fissa in basso porta WhatsApp e Indicazioni.
 
 ## Elevation & Depth
 
@@ -130,7 +130,7 @@ Piatto. La profondità viene dai filetti e dall'inversione paper/ink. L'unica "o
 
 ## Shapes
 
-Pillole (999px) per bottoni e chip; 12–14px per foto e blocchi; 18px per la scheda Ultimo arrivo e il visore; 4px per l'etichetta DEMO.
+Pillole (999px) per bottoni e chip; 12–14px per foto e blocchi; 18px per la vetrina che ruota.
 
 ## Components
 
