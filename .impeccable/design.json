@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-02T14:00:00+02:00",
+  "title": "Design System: Novum Store",
+  "extensions": {
+    "colorMeta": {
+      "ink": { "role": "neutral", "displayName": "Ink" },
+      "paper": { "role": "primary", "displayName": "Paper (unico inchiostro)" },
+      "oak": { "role": "secondary", "displayName": "Oak (parquet del negozio)" },
+      "concrete": { "role": "neutral", "displayName": "Concrete" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "H2 di sezione, maiuscolo, Archivo wdth 122." },
+      "reel-overlay": { "displayName": "Reel overlay", "purpose": "Nomi dei capi sopra la foto, wdth 125." },
+      "signature": { "displayName": "Firma", "purpose": "Solo logo in corsivo." }
+    },
+    "shadows": [
+      { "name": "reel-scrim", "value": "linear-gradient(to top, rgb(0 0 0 / .82), transparent 46%)", "purpose": "Leggibilità del testo sopra le foto." }
+    ],
+    "motion": [
+      { "name": "cut", "value": "90ms steps(2, jump-none)", "purpose": "Tagli di montaggio tra fotogrammi e filtri." },
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Hover e micro-stati." },
+      { "name": "reel-frame", "value": "5200ms linear", "purpose": "Durata di un fotogramma del reel." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "640px" },
+      { "name": "stack", "value": "900px" },
+      { "name": "nav", "value": "1080px" },
+      { "name": "short", "value": "max-height 760px" }
+    ]
+  },
+  "components": [
+    { "name": "Primary Button", "kind": "button", "refersTo": "button-primary", "description": "Azione principale (WhatsApp).", "html": "<a class=\"ds-btn\">Scrivici su WhatsApp</a>", "css": ".ds-btn{display:inline-flex;align-items:center;min-height:46px;padding:0 1.25em;border-radius:999px;background:#f6f4f0;color:#0a0a0a;font:700 1rem Archivo,system-ui,sans-serif;border:1.5px solid #f6f4f0;text-decoration:none}.ds-btn:hover{background:#d8d2c8;border-color:#d8d2c8}" },
+    { "name": "Line Button", "kind": "button", "refersTo": "button-line", "description": "Azione secondaria.", "html": "<a class=\"ds-btn-l\">Vedi tutti i capi</a>", "css": ".ds-btn-l{display:inline-flex;align-items:center;min-height:46px;padding:0 1.25em;border-radius:999px;background:#0a0a0a;color:#f6f4f0;font:700 1rem Archivo,system-ui,sans-serif;border:1.5px solid rgb(246 244 240/.32);text-decoration:none}.ds-btn-l:hover{border-color:#f6f4f0}" },
+    { "name": "Category Chip", "kind": "chip", "refersTo": "chip", "description": "Filtro categoria con conteggio.", "html": "<button class=\"ds-chip\" aria-pressed=\"true\">Tutto 10</button>", "css": ".ds-chip{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid #f6f4f0;background:#f6f4f0;color:#0a0a0a;font:650 .9375rem Archivo,system-ui,sans-serif}" }
+  ],
+  "narrative": {
+    "northStar": "Drop Reel",
+    "overview": "Il sito racconta ogni drop come i reel del negozio: verticale, numerato, a tagli secchi. Nero ovunque, bianco unico inchiostro, Archivo sull'asse della larghezza.",
+    "keyCharacteristics": ["Nero totale, bianco unico inchiostro", "Archivo ultra-espanso per la voce dei reel", "Tagli di montaggio a due fotogrammi", "Logo a strass interattivo", "Stato del negozio dal vivo"],
+    "rules": [{ "name": "The One Ink Rule", "body": "Nessun colore d'accento: enfasi con peso, larghezza, scala o inversione.", "section": "colors" }],
+    "dos": ["Prezzo, stato e WhatsApp sempre a un tocco", "Foto vere del negozio", "Dati demo etichettati"],
+    "donts": ["Niente accenti colorati o gradienti decorativi", "Niente eyebrow sopra i titoli", "Niente dissolvenze lunghe"]
+  }
+}

@@ -1,0 +1,9 @@
+# Screenshot e file temporanei di revisione
+.impeccable/review/
+.impeccable/questions/
+.impeccable/decision.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+node_modules/
