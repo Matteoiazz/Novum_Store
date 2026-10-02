@@ -152,6 +152,9 @@ L'hero è a tutto schermo: dietro, colonne verticali di foto dei capi (4 su desk
 ### Ultimi arrivi (home)
 I primi 4 capi di `capi.js` in una griglia pulita: foto verticali 3:4 intere (mai schiacciate: la griglia si restringe sugli schermi bassi), sotto nome e prezzo, poi "Chiedi su WhatsApp"; bottone "Vai al catalogo". Su telefono 2×2 con solo foto, nome e prezzo. Le grucce/cartellini scorrevoli sono stati provati e scartati dal cliente (troppo effetto, poco professionale).
 
+### Cursore (solo mouse, solo home)
+Il cursore resta quello di sistema. Sopra le foto dei capi (muro iniziale, Ultimi arrivi, foto del negozio) un **faretto** morbido segue il cursore scurendo leggermente il resto della foto; se il cursore si ferma ~0.65s compare per 0.6s un **brillio di strass** a quattro punte (max uno ogni 1.4s). Disattivato su touch, con prefers-reduced-motion e nel catalogo.
+
 ### Menu e barra in basso
 Sotto i 1080px il menu del header diventa un pulsante "Menu" che apre un pannello a tutto schermo con voci giganti in maiuscolo (wdth 125), stato del negozio e WhatsApp. Su telefono la barra fissa in basso ha tre voci: Catalogo (Home nel catalogo), WhatsApp in evidenza, Indicazioni. Lo stato in alto usa una forma breve ("Aperto · 20:00").
 

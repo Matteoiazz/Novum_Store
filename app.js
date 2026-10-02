@@ -290,6 +290,37 @@
     if (ITEMS.some((x) => x.id === hash)) open(hash);
   }
 
+  /* ---------------- Faretto e brillio sul cursore (solo mouse) ---------------- */
+  function initCursorLight() {
+    if (REDUCED || !FINE_POINTER || !$(".hero")) return;
+    const SEL = ".wall__col, .arr__photo, .store__photo";
+    const glint = document.createElement("span");
+    glint.className = "glint"; glint.setAttribute("aria-hidden", "true");
+    glint.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 0C12.8 8 16 11.2 24 12 16 12.8 12.8 16 12 24 11.2 16 8 12.8 0 12 8 11.2 11.2 8 12 0Z"/></svg>';
+    document.body.appendChild(glint);
+    let rest = 0, last = 0;
+    const sparkle = (x, y) => {
+      const now = performance.now(); if (now - last < 1400) return; last = now;
+      glint.style.left = `${x}px`; glint.style.top = `${y}px`;
+      glint.classList.remove("is-on"); void glint.offsetWidth; glint.classList.add("is-on");
+    };
+    document.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse") return;
+      const t = e.target.closest && e.target.closest(SEL);
+      clearTimeout(rest);
+      if (!t) return;
+      const r = t.getBoundingClientRect();
+      t.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      t.style.setProperty("--my", `${e.clientY - r.top}px`);
+      t.classList.add("is-lit");
+      rest = setTimeout(() => sparkle(e.clientX, e.clientY), 650);
+    }, { passive: true });
+    document.addEventListener("pointerout", (e) => {
+      const t = e.target.closest && e.target.closest(SEL);
+      if (t && !t.contains(e.relatedTarget)) { t.classList.remove("is-lit"); clearTimeout(rest); }
+    });
+  }
+
   /* ---------------- Strass wordmark ---------------- */
   function initStrass() {
     const host = $("[data-strass]"); if (!host) return;
@@ -510,6 +541,7 @@
   initArrivals();
   initMenu();
   initMap();
+  initCursorLight();
   initCatalogPage();
   initStrass();
   initKeys(initStrassMode());
