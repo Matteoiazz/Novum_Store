@@ -473,7 +473,7 @@ a.item__media { display: block; }
 .cat-grid.is-cutting { animation: gridcut var(--cut) 1; }
 .card { display: flex; flex-direction: column; min-width: 0; scroll-margin-top: calc(var(--bar-h) + 90px); }
 .card__media {
-  position: relative; display: block; width: 100%; padding: 0; border: 0; cursor: zoom-in;
+  position: relative; display: block; width: 100%; padding: 0; border: 0; cursor: pointer;
   aspect-ratio: 4 / 5; overflow: hidden; border-radius: 14px; background: var(--ink-3);
   max-height: calc(100svh - var(--bar-h) - 300px); min-height: 300px;
 }
