@@ -267,9 +267,14 @@
 
     function makeSprite(r) {
       const s = document.createElement("canvas");
-      const size = Math.ceil(r * 2 * dpr) + 2;
+      const size = Math.ceil(r * 2 * 1.6 * dpr) + 2;
       s.width = s.height = size;
       const c = s.getContext("2d"), m = size / 2, R = r * dpr;
+      // castone scuro: stacca lo strass da qualsiasi foto sotto
+      const halo = c.createRadialGradient(m, m, R * 0.9, m, m, R * 1.6);
+      halo.addColorStop(0, "rgba(5,5,5,0.9)");
+      halo.addColorStop(1, "rgba(5,5,5,0)");
+      c.fillStyle = halo; c.beginPath(); c.arc(m, m, R * 1.6, 0, Math.PI * 2); c.fill();
       const g = c.createRadialGradient(m - R * 0.35, m - R * 0.35, R * 0.05, m, m, R);
       g.addColorStop(0, "#ffffff");
       g.addColorStop(0.35, "#e9e7e2");
