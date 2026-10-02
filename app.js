@@ -489,7 +489,7 @@
         $$(".bar__nav a").forEach((a) => { if (a.getAttribute("href").startsWith("#")) a.setAttribute("aria-current", String(a.getAttribute("href") === `#${en.target.id}`)); });
       });
     }, { rootMargin: "-45% 0px -50% 0px" });
-    ["home", "capi", "negozio", "contatti"].forEach((id) => { const el = document.getElementById(id); if (el) navObserver.observe(el); });
+    ["home", "negozio", "contatti"].forEach((id) => { const el = document.getElementById(id); if (el) navObserver.observe(el); });
   }
 
   function hello() {
