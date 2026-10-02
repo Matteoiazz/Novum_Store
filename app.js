@@ -59,8 +59,8 @@
     if (cur) {
       const left = cur[1] - now.min;
       const h = Math.floor(left / 60), m = left % 60;
-      const span = h ? `${h} h ${pad(m)} min` : `${m} min`;
-      return { open: true, short: `Aperto · fino alle ${hhmm(cur[1])}`, big: "Aperto ora", next: `Chiude alle ${hhmm(cur[1])}, tra ${span}.` };
+      const span = h ? `${h}\u00a0h\u00a0${pad(m)}\u00a0min` : `${m}\u00a0min`;
+      return { open: true, short: `Aperto · fino alle ${hhmm(cur[1])}`, mini: `Aperto · ${hhmm(cur[1])}`, big: "Aperto ora", next: `Chiude alle\u00a0${hhmm(cur[1])}, tra ${span}.` };
     }
     for (let i = 0; i < 30; i++) {
       const iso = addDays(now.iso, i);
@@ -68,16 +68,18 @@
       if (s) {
         const dow = new Date(`${iso}T12:00:00Z`).getUTCDay();
         const when = i === 0 ? "oggi" : i === 1 ? "domani" : DAY_NAMES[dow];
-        return { open: false, short: `Chiuso · apre ${i === 0 ? "" : when + " "}alle ${hhmm(s[0])}`, big: closedOn(now.iso) ? "Chiuso per ferie" : "Ora chiuso", next: `Riapre ${when} alle ${hhmm(s[0])}.` };
+        const shortDay = i === 0 ? "" : i === 1 ? "domani " : DAY_SHORT[dow].toLowerCase() + " ";
+        return { open: false, short: `Chiuso · apre ${i === 0 ? "" : when + " "}alle ${hhmm(s[0])}`, mini: `Chiuso · ${shortDay}${hhmm(s[0])}`, big: closedOn(now.iso) ? "Chiuso per ferie" : "Ora chiuso", next: `Riapre ${when} alle\u00a0${hhmm(s[0])}.` };
       }
     }
-    return { open: false, short: "Chiuso", big: "Ora chiuso", next: "" };
+    return { open: false, short: "Chiuso", mini: "Chiuso", big: "Ora chiuso", next: "" };
   }
 
   function renderStatus() {
     const st = shopStatus();
     document.body.classList.toggle("is-open", st.open);
     $$("[data-status-text]").forEach((el) => (el.textContent = st.short));
+    $$("[data-status-mini]").forEach((el) => (el.textContent = st.mini));
     const big = $("[data-status-big]"); if (big) big.textContent = st.big;
     const nx = $("[data-status-next]"); if (nx) nx.textContent = st.next;
     renderHours();
@@ -154,22 +156,91 @@
     build();
   }
 
-  /* ---------------- Ultimi arrivi (home) ---------------- */
+  /* ---------------- Ultimi arrivi: capi appesi (home) ---------------- */
   let setFilter = () => {};
-  function initLatestGrid() {
-    const grid = $("[data-grid]"); if (!grid) return;
-    grid.innerHTML = ITEMS.slice(0, HOME_COUNT).map((it) => `
-      <li class="item">
-        <a class="item__media" href="catalogo.html#${it.id}" aria-label="Vedi ${esc(it.name)} nel catalogo">
-          <img src="${esc(it.img)}" alt="${esc(it.alt)}" style="object-position:${it.pos}" loading="lazy" width="360" height="640">
+  const RAIL_COUNT = 8;
+  const HANGER = `<svg class="hang__hanger" viewBox="0 0 120 44" aria-hidden="true"><path d="M60 18V12a6 6 0 1 0-6-6"/><path d="M60 18 6 40h108Z"/></svg>`;
+  function initRail() {
+    const track = $("[data-rail]"); if (!track) return;
+    const items = ITEMS.slice(0, RAIL_COUNT);
+    track.innerHTML = items.map((it) => `
+      <li class="hang">
+        ${HANGER}
+        <a class="hang__photo" href="catalogo.html#${it.id}" draggable="false">
+          <img src="${esc(it.img)}" alt="${esc(it.alt)}" style="object-position:${it.pos}" loading="lazy" width="360" height="640" draggable="false">
         </a>
-        <div class="item__body">
-          <h3 class="item__name">${esc(it.name)}</h3>
-          <p class="price">${euro(it.price)}</p>
-          <p class="item__cat">${esc(catLabelOf(it.cat))}</p>
-          <a class="item__ask" href="${askLink(it)}" target="_blank" rel="noopener">Chiedi su WhatsApp <svg class="ico"><use href="#i-arrow"/></svg></a>
+        <div class="tag">
+          <a class="tag__name" href="catalogo.html#${it.id}" draggable="false">${esc(it.name)}</a>
+          <span class="tag__price">${euro(it.price)}</span>
+          <a class="tag__ask" href="${askLink(it)}" target="_blank" rel="noopener" draggable="false">Chiedi<svg class="ico"><use href="#i-arrow"/></svg></a>
         </div>
-      </li>`).join("");
+      </li>`).join("") + `
+      <li class="hang hang--more">
+        ${HANGER}
+        <a class="hang__all" href="catalogo.html" draggable="false"><span>Tutto il catalogo</span><svg class="ico"><use href="#i-arrow"/></svg></a>
+      </li>`;
+
+    const prev = $("[data-rail-prev]"), next = $("[data-rail-next]"), nav = $("[data-rail-nav]");
+    const stepPx = () => { const li = track.querySelector(".hang"); return li ? li.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0) : 300; };
+    const sync = () => {
+      const max = track.scrollWidth - track.clientWidth - 2;
+      if (nav) nav.hidden = max <= 0;
+      if (prev) prev.disabled = track.scrollLeft <= 2;
+      if (next) next.disabled = track.scrollLeft >= max;
+    };
+    prev && prev.addEventListener("click", () => track.scrollBy({ left: -stepPx() * 2, behavior: REDUCED ? "auto" : "smooth" }));
+    next && next.addEventListener("click", () => track.scrollBy({ left: stepPx() * 2, behavior: REDUCED ? "auto" : "smooth" }));
+    track.addEventListener("scroll", sync, { passive: true });
+    addEventListener("resize", sync);
+    track.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") { e.preventDefault(); track.scrollBy({ left: stepPx(), behavior: "smooth" }); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); track.scrollBy({ left: -stepPx(), behavior: "smooth" }); }
+    });
+
+    // trascina col mouse (su touch scorre già da sé)
+    let down = false, moved = false, sx = 0, sl = 0;
+    track.addEventListener("pointerdown", (e) => { if (e.pointerType !== "mouse" || e.button !== 0) return; down = true; moved = false; sx = e.clientX; sl = track.scrollLeft; });
+    addEventListener("pointermove", (e) => {
+      if (!down) return;
+      const dx = e.clientX - sx;
+      if (!moved && Math.abs(dx) > 6) { moved = true; track.classList.add("is-dragging"); }
+      if (moved) track.scrollLeft = sl - dx;
+    });
+    addEventListener("pointerup", () => { if (!down) return; down = false; setTimeout(() => track.classList.remove("is-dragging"), 0); });
+    track.addEventListener("click", (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+    requestAnimationFrame(sync);
+  }
+
+  /* ---------------- Menu (telefono e tablet) ---------------- */
+  function initMenu() {
+    const btn = $("[data-menu-open]"), menu = $("[data-menu]"); if (!btn || !menu) return;
+    const label = $("span", btn), use = $("use", btn);
+    const set = (open) => {
+      menu.hidden = !open;
+      btn.setAttribute("aria-expanded", String(open));
+      label.textContent = open ? "Chiudi" : "Menu";
+      use.setAttribute("href", open ? "#i-x" : "#i-menu");
+      document.documentElement.classList.toggle("menu-open", open);
+      if (open) $("a", menu).focus();
+    };
+    btn.addEventListener("click", () => set(menu.hidden));
+    $$("[data-menu-link]", menu).forEach((a) => a.addEventListener("click", () => set(false)));
+    addEventListener("keydown", (e) => { if (e.key === "Escape" && !menu.hidden) { set(false); btn.focus(); } });
+    matchMedia("(min-width: 1081px)").addEventListener("change", (m) => { if (m.matches) set(false); });
+  }
+
+  /* ---------------- Mappa: si carica solo se richiesta ---------------- */
+  function initMap() {
+    const box = $("[data-map]"); if (!box) return;
+    const SRC = "https://maps.google.com/maps?q=Piazza%20Fausto%20e%20Luigi%20Gullo%2022%2C%20Cosenza&z=16&output=embed";
+    const load = () => {
+      box.innerHTML = `<iframe title="Mappa: Novum Store, Piazza Fausto e Luigi Gullo 22, Cosenza" src="${SRC}" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`;
+      box.classList.add("is-loaded");
+    };
+    let ok = false;
+    try { ok = localStorage.getItem("novum-maps") === "1"; } catch (_) {}
+    if (ok) { load(); return; }
+    $("[data-map-load]", box).addEventListener("click", () => { try { localStorage.setItem("novum-maps", "1"); } catch (_) {} load(); });
   }
 
   /* ---------------- Catalogo ---------------- */
@@ -333,6 +404,7 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
       const R = 70 + gap * 4, R2 = R * R;
+      let moving = false;
       const sw = sprite.width / dpr;
       for (const d of dots) {
         if (!REDUCED) {
@@ -343,14 +415,10 @@
           }
           d.vx = (d.vx + ax) * 0.8; d.vy = (d.vy + ay) * 0.8;
           d.x += d.vx; d.y += d.vy;
+          if (Math.abs(d.vx) + Math.abs(d.vy) > 0.03) moving = true;
         } else { d.x = d.hx; d.y = d.hy; }
         const s = sw * d.s;
         ctx.drawImage(sprite, d.x - s / 2, d.y - s / 2, s, s);
-      }
-      // twinkles: a few 4-point glints
-      if (!REDUCED && Math.random() < 0.18 && dots.length) {
-        const d = dots[(Math.random() * dots.length) | 0];
-        sparks.push({ d, t: 0 });
       }
       for (let i = sparks.length - 1; i >= 0; i--) {
         const sp = sparks[i]; sp.t += 1 / 26;
@@ -362,7 +430,8 @@
         ctx.moveTo(sp.d.x, sp.d.y - L); ctx.lineTo(sp.d.x, sp.d.y + L);
         ctx.stroke();
       }
-      running = !REDUCED && visible;
+      // continua solo se qualcosa si muove: niente animazione a vuoto
+      running = !REDUCED && visible && (moving || mouse.active || sparks.length > 0);
       if (running) raf = requestAnimationFrame(step);
     }
     function wake() { if (!raf && sprite) raf = requestAnimationFrame(step); }
@@ -377,6 +446,12 @@
       visible = en.isIntersecting;
       if (visible) wake(); else { cancelAnimationFrame(raf); raf = 0; }
     }).observe(host);
+    // qualche brillio ogni tanto, a basso costo
+    if (!REDUCED) setInterval(() => {
+      if (!visible || document.hidden || !dots.length) return;
+      for (let i = 0; i < 2; i++) sparks.push({ d: dots[(Math.random() * dots.length) | 0], t: 0 });
+      wake();
+    }, 700);
 
     let rt = 0;
     new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(build, 120); }).observe(host);
@@ -469,7 +544,9 @@
   renderStatus();
   setInterval(renderStatus, 30_000);
   initWall();
-  initLatestGrid();
+  initRail();
+  initMenu();
+  initMap();
   initCatalogPage();
   initStrass();
   initKeys(initStrassMode());

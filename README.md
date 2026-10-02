@@ -17,6 +17,8 @@ Le richieste dei clienti arrivano su WhatsApp con il nome del capo già scritto.
 - Foto del negozio: sostituire `img/negozio.jpg` (stesso nome file).
 - Logo in versione vettoriale (ora il corsivo è reso con il font Great Vibes).
 - Ferie e chiusure: `CLOSURES` in `app.js`.
+- Privacy: aggiungere ragione sociale e partita IVA del negozio in `privacy.html`.
+- Dominio: quando ci sarà un dominio proprio, sostituire `novumstore-smoky.vercel.app` negli `og:`/`canonical` di `index.html` e `catalogo.html` e nei dati strutturati.
 
 ## Chicche
 - Logo NOVUM a strass: passa il mouse o il dito.
